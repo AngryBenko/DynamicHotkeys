@@ -1,0 +1,369 @@
+#SingleInstance, force
+#NoEnv
+#MaxHotkeysPerInterval 200
+#InstallKeybdHook
+#InstallMouseHook
+
+/*
+TODO:
+- GUI:
+	- Have global shortcuts moved to a second "column"
+*/
+
+#Include, %A_ScriptDir%\lib\hotkeyAction.ahk
+#Include, %A_ScriptDir%\lib\mainGui.ahk
+#Include, %A_ScriptDir%\lib\EditGui.ahk
+#Include, %A_ScriptDir%\lib\HelpGui.ahk
+#Include, %A_ScriptDir%\lib\Utilities.ahk
+#Include, %A_ScriptDir%\lib\Bind.ahk
+#Include, %A_ScriptDir%\lib\SetupFixedHotkeys.ahk
+#Include, %A_ScriptDir%\lib\LoadSaveSettings.ahk
+#Include, %A_ScriptDir%\lib\ModifyOptions.ahk
+#Include, %A_ScriptDir%\lib\EnableHotkeys.ahk
+#Include, %A_ScriptDir%\lib\DisableHotkeys.ahk
+#Include, %A_ScriptDir%\lib\UpdateHotkeyControls.ahk
+#Include, %A_ScriptDir%\lib\Init.ahk
+#Include, %A_ScriptDir%\lib\Lines.ahk
+; scripted by Billy Yu
+;
+; ----- VK/Scan Codes ------
+; VK | SC | Key 
+; 60  052	Numpad0/NumpadIns
+; 61  04F	Numpad1/NumpadEnd
+; 62  050	Numpad2/NumpadDown
+; 63  051	Numpad3/NumpadPgDn
+; 64  04B   Numpad4/NumpadLeft
+; 65  04C   Numpad5/NumpadClear
+; 66  04D   Numpad6/NumpadRight
+; 67  047   Numpad7/NumpadHome
+; 68  048   Numpad8/NumpadUp
+; 69  049   Numpad9/NumpadPgUp
+;--------- TO-DO ------------
+; 
+;----------------------------
+; Build list of "End Keys" for Input command
+global EXTRA_KEY_LIST := "{Escape}"	; DO NOT REMOVE! - Used to quit binding
+; Standard non-printables
+;global EXTRA_KEY_LIST .= "{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}{Left}{Right}{Up}{Down}"
+;global EXTRA_KEY_LIST .= "{Home}{End}{PgUp}{PgDn}{Del}{Ins}{BackSpace}{Pause}"
+; Numpad - Numlock ON
+;global EXTRA_KEY_LIST .= "{Numpad0}{Numpad1}{Numpad2}{Numpad3}{Numpad4}{Numpad5}{Numpad6}{Numpad7}{Numpad8}{Numpad9}{NumpadDot}{NumpadMult}{NumpadAdd}{NumpadSub}"
+; Numpad - Numlock OFF
+;global EXTRA_KEY_LIST .= "{NumpadIns}{NumpadEnd}{NumpadDown}{NumpadPgDn}{NumpadLeft}{NumpadClear}{NumpadRight}{NumpadHome}{NumpadUp}{NumpadPgUp}{NumpadDel}"
+; Numpad - Common
+;global EXTRA_KEY_LIST .= "{NumpadMult}{NumpadAdd}{NumpadSub}{NumpadDiv}{NumpadEnter}"
+; Stuff we may or may not want to trap
+;EXTRA_KEY_LIST .= "{Numlock}"
+;global EXTRA_KEY_LIST .= "{Tab}{Enter}{Backspace}"
+;EXTRA_KEY_LIST .= "{PrintScreen}"
+; Browser keys
+;EXTRA_KEY_LIST .= "{Browser_Back}{Browser_Forward}{Browser_Refresh}{Browser_Stop}{Browser_Search}{Browser_Favorites}{Browser_Home}"
+; Media keys
+;EXTRA_KEY_LIST .= "{Volume_Mute}{Volume_Down}{Volume_Up}{Media_Next}{Media_Prev}{Media_Stop}{Media_Play_Pause}"
+; App Keys
+;EXTRA_KEY_LIST .= "{Launch_Mail}{Launch_Media}{Launch_App1}{Launch_App2}"
+
+; BindMode vars
+global HKControlType := 0
+global HKModifierState := {}
+global HKLastHotkey := 0 ; Time that Escape was pressed to exit key binding. Used to determine if Escape is held (Clear binding)
+global DefaultHKObject := {hkp: "", typep: "", hks: "", types: ""}
+
+; Misc vars
+global Title := "FLIDE 3D Helper v2.0"
+global VersionVar := ["HotkeyList", "LIHotkeyList", "REHotkeyList", "LGHotkeyList", "SVASEHotkeyList"]
+global DisplayVar := ["Spline", "Connection Tool", "Reverse Direction", "Reverse Region", "Satellite Tube", "Google Tiles", "Windows Snapshot", "Camera Forward", "Camera Backward"]
+global LIDisplayVar := ["Double Solid Yellow Median", "Solid Yellow Median", "Dashed White", "Solid White Shoulder", "Solid White Line Crosswalk", "Solid White Line Crosswalk/Intersection", "Crosswalk Crosswalk-Region", "Crosswalk Crosswalk/Intersection", "Double Solid Yellow Bidirectional", "Inferred Parking", "Dashed Solid Yellow Suicide", "Solid White Bike Region", "Solid White Bike/Shoulder", "Short Dashed Normal", "Short Dashed Bike", "Short Dashed Shoulder", "Solid White Intersection"]
+global REDisplayVar := ["Road Boundary", "Median Flow-Separating", "Median Flow-Same", "Intersection Island", "Roundabout", "Under_Roof"]
+global LGDisplayVar := ["Type Lane", "Type Left_Bounded", "Type Right_Bounded", "Type Connection", "Type Bidirectional", "Type Roundabout", "Type Guide"]
+global ININame := BuildIniName()
+global LIHotkeyList := []
+global REHotkeyList := []
+global LGHotkeyList := []
+global SVASEHotkeyList := []
+
+global modCheck := 2
+global specialCheck := 2
+global workflowCheck := "Line"
+global prevWFCheck := "Line"
+global camDisable1 := 0
+global camDisable2 := 0
+
+global NumHotkeys := 10
+global LINumHotkeys := 17
+global RENumHotkeys := 6
+global LGNumHotkeys := 7
+global SVASENumHotkeys := 0
+
+
+global ypos := 105
+
+height := 0
+
+; Create the GUI, using a Loop feature that auto updates the GUI
+
+;general .= "General Info`n"
+
+;LoadSettings()
+
+init()
+; call heightmod
+height := guiHeightModifier()
+/*
+drawHeaderGUI()
+
+drawWorkflowGUI(1)
+*/
+drawMainGUI()
+;drawGlobalGUI()
+; Set GUI State
+LoadSettings()
+;SaveSettings()
+;SetupFixedHotKeys()
+
+; Enable defined hotkeys
+EnableHotkeys()
+
+;SaveSettings()
+
+return ;
+
+
+
+
+2ndGui: ;Reduce Gui to functions
+/*
+	Gui, MainGui: +LastFound
+	WinGetPos, xx, yy
+	xx += 10
+	yy += 10
+	DisableHotkeys()
+	editText .= "To edit your keybinds, click on 'Set Primary'.`n"
+	editText .= "Click 'Set Secondary' if you would like a secondary keybind for the same shortcut.`n"
+	editText .= "If you would like to reset the keybinds, click on 'Reset Key'"
+	Gui, EditGui: Font, s8 bold, Segoe UI
+	Gui, EditGui: Add, Text, cBlack y5, %editText%
+	Gui, EditGui: Font, s10 normal, Segoe UI
+	Gui, EditGui: Add, Text, cBlack yp+45 x185, Primary
+	Gui, EditGui: Add, Text, cBlack yp xp+120, Secondary
+	ypos := 70
+	; The GUI that allows editing of keybinds
+
+	drawWorkflowGUI(2)
+	;draw2GUI()
+
+	Gui, EditGui: Add, Button, gCloseEdit vCloseEdit xp+25 yp+35, Save
+	;height := height + 60
+	Gui, EditGui: Show, Center w650 h%height% x%xx% y%yy%, Edit Keybinds
+
+	LoadSettings()
+	*/
+	drawEditGUI()
+	return
+
+MenuHandler:
+	return
+
+Reload:
+	Reload
+	return
+
+Help:
+	/*
+	Gui, MainGui: +LastFound
+	WinGetPos, xxx, yyy
+	xxx += 100
+	yyy += 100
+	helpText .= "Welcome to FLIDE 3D LG Helper v2.0`n"
+	helpText .= "Please visit the documentation for further information.`n"
+	helpText .= "If you still require further assistance, please reach out to Billy Yu. @bilyu`n"
+	Gui, HelpGui: Add, Text, ,%helpText%
+	Gui, HelpGui: +AlwaysOnTop
+	Gui, HelpGui: Add, Button, gCloseHelp vCloseHelp xp+5 yp+50, Close
+
+
+	Gui, HelpGui: Show, x%xxx% y%yyy%
+	*/
+	;msgbox Hi! I'm Help
+	drawHelpGUI()
+	return
+
+CloseHelp:
+HelpGuiGuiClose:
+	helpText := ""
+	Gui, HelpGui: Destroy
+	return
+
+CloseEdit:
+EditGuiGuiClose:
+
+	editText := ""
+	EnableHotkeys()
+	Gui, EditGui: Destroy ; We cannot recreate the same gui. We must destroy or redisplay it.
+	return
+
+MainGuiGuiClose:
+	ExitApp
+	return
+	
+Workflow:
+	global workflowCheck
+	
+	; depending on the workflow, change GUI and load proper settings
+	Gui, Submit, NoHide
+	
+	prevWFCheck := workflowCheck
+	workflowCheck := Workflow
+
+	destroy1GUI()
+	; redraw GUI
+	global height := guiHeightModifier()
+	drawMainGUI()
+	/*
+	drawHeaderGUI()
+	drawWorkflowGUI()
+	*/
+	;drawGlobalGUI()
+	UpdateHotkeyControls()
+
+	OptionChanged()
+	
+	return
+	
+CamCheck:
+	Gui, Submit, NoHide
+	
+	workflowCheck := Workflow
+
+	OptionChanged()
+	UpdateHotkeyControls()
+	return
+
+ModCheck:
+	global modCheck
+
+	Gui, Submit, NoHide
+
+	prevWFCheck := workflowCheck
+	modCheck := ModGroup
+	
+	Loop 3 {
+		GuiControl, MainGui: Disable, Button%A_Index%
+	}
+	DisableHotkeys()
+	ModifyOptions()
+	UpdateHotkeyControls()
+	SaveSettings()
+	EnableHotkeys()
+	Loop 3 {
+		GuiControl, MainGui: Enable, Button%A_Index%
+	}
+	return
+
+SpecialChoice:
+	global specialCheck
+
+	Gui, Submit, Nohide
+
+	prevWFCheck := workflowCheck
+	specialCheck := SpecialChoice
+
+	;FileAppend SPECIAL: %specialCheck%`n, *
+	;GuiControl, MainGui: Disable, SpecialChoice
+	UpdateHotkeyControls()
+	OptionChanged()
+
+	;GuiControl, MainGui: Enable, SpecialChoice
+	return
+
+; -------------- Keybinds ------------------------
+; Test that bound hotkeys work
+DoHotkey1:
+	shortcutAutoDist(substr(A_ThisLabel, 9))
+	return
+
+DoHotkey2:
+	shortcutAutoDist(substr(A_ThisLabel, 9))
+	return
+
+DoHotkey3:
+	shortcutAutoDist(substr(A_ThisLabel, 9))
+	return
+
+DoHotkey4:
+	shortcutAutoDist(substr(A_ThisLabel, 9))
+	return
+
+TeamsMute:
+	teamsmute()
+	;msgbox TEAMSMUTE
+	return
+
+; Something changed - rebuild
+OptionChanged:
+	OptionChanged()
+	return
+
+; Detects a pressed key combination
+Bind1:
+	Bind(substr(A_GuiControl,7), 1) 
+	return
+
+Bind2:
+	Bind(substr(A_GuiControl,7), 2) ; param: 1 or 2 (prim or sec)
+	return
+
+
+Reset:
+	DeleteHotKey(substr(A_GuiControl, 7))
+	return
+
+
+
+EscapeReleased:
+	hotkey, Escape up, EscapeReleased, OFF
+	return
+
+; Enables User-Defined Hotkeys
+
+
+#If BindMode ; This is will allow xbutton1 and enter to be solo keybinds
+	; Detect down of modifier keys
+	*xbutton2::
+	*xbutton1::
+	*mbutton::
+		mod := substr(A_ThisHotkey, 2)
+		SetModifier(mod, 1)
+		return
+	
+	; Detect up of modifier keys
+	*xbutton2 up::
+	*xbutton1 up::
+	*mbutton up::
+		mod := substr(substr(A_ThisHotkey, 2), 1, strlen(A_ThisHotkey) - 4)
+		ct := CurrentModifierCount()
+		;FileAppend, %ct%, *
+		if (CurrentModifierCount() == 1) {
+			HKControlType := 1
+			HKSecondaryInput := mod
+
+			Send {Escape}
+		}
+
+		SetModifier(mod, 0)
+		return
+
+	/*
+	xbutton1::
+	xbutton2::
+		global HKControlType := 4
+		global HKSecondaryInput := A_ThisHotkey
+		Send {Escape}
+		return
+	enter::
+		global HKControlType := 4
+		global HKSecondaryInput := A_ThisHotkey
+		Send {Escape}
+		return
+		*/
+#If
