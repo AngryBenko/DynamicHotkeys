@@ -6,7 +6,7 @@ SaveSettings(){
 	iniwrite, %specialCheck%, %ININame%, Version, special
 	iniwrite, %workflowCheck%, %ININame%, Version, workflow
 
-	if (workflowCheck == "Line") {
+	if (workflowCheck == "Line" || firstRun == 1) {
 		Loop % (LINumHotkeys + NumHotkeys) {
 			hkp := LIHotkeyList[A_Index].hkp
 			typep := LIHotkeyList[A_Index].typep
@@ -19,7 +19,8 @@ SaveSettings(){
 			iniwrite, %hks%, %ININame%, LIHotkeys, hk_%A_Index%_hks
 			iniwrite, %types%, %ININame%, LIHotkeys, hk_%A_Index%_types
 		}
-	} else if (workflowCheck == "RE") {
+	}
+	if (workflowCheck == "RE" || firstRun == 1) {
 		Loop % (RENumHotkeys + NumHotkeys) {
 			hkp := REHotkeyList[A_Index].hkp
 			typep := REHotkeyList[A_Index].typep
@@ -32,7 +33,8 @@ SaveSettings(){
 			iniwrite, %hks%, %ININame%, REHotkeys, hk_%A_Index%_hks
 			iniwrite, %types%, %ININame%, REHotkeys, hk_%A_Index%_types
 		}
-	} else if (workflowCheck == "LG") {
+	}
+	if (workflowCheck == "LG" || firstRun == 1) {
 		Loop % (LGNumHotkeys + NumHotkeys) {
 			hkp := LGHotkeyList[A_Index].hkp
 			typep := LGHotkeyList[A_Index].typep
@@ -46,7 +48,8 @@ SaveSettings(){
 			iniwrite, %types%, %ININame%, LGHotkeys, hk_%A_Index%_types
 
 		}
-	} else if (workflowCheck == "SVA/SE") {
+	}
+	if (workflowCheck == "SVA/SE" || firstRun == 1) {
 		Loop % (SVASENumHotkeys + NumHotkeys) {
 			hkp := SVASEHotkeyList[A_Index].hkp
 			typep := SVASEHotkeyList[A_Index].typep

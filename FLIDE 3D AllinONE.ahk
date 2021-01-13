@@ -70,10 +70,12 @@ global HKLastHotkey := 0 ; Time that Escape was pressed to exit key binding. Use
 global DefaultHKObject := {hkp: "", typep: "", hks: "", types: ""}
 
 ; Misc vars
+global firstRun := 0
 global Title := "FLIDE 3D Helper v2.0"
 global VersionVar := ["HotkeyList", "LIHotkeyList", "REHotkeyList", "LGHotkeyList", "SVASEHotkeyList"]
 global DisplayVar := ["Spline", "Connection Tool", "Reverse Direction", "Reverse Region", "Satellite Tube", "Google Tiles", "Windows Snapshot", "Camera Forward", "Camera Backward"]
 global LIDisplayVar := ["Double Solid Yellow Median", "Solid Yellow Median", "Dashed White", "Solid White Shoulder", "Solid White Line Crosswalk", "Solid White Line Crosswalk/Intersection", "Crosswalk Crosswalk-Region", "Crosswalk Crosswalk/Intersection", "Double Solid Yellow Bidirectional", "Inferred Parking", "Dashed Solid Yellow Suicide", "Solid White Bike Region", "Solid White Bike/Shoulder", "Short Dashed Normal", "Short Dashed Bike", "Short Dashed Shoulder", "Solid White Intersection"]
+global LIDisplayVarAdd := []
 global REDisplayVar := ["Road Boundary", "Median Flow-Separating", "Median Flow-Same", "Intersection Island", "Roundabout", "Under_Roof"]
 global LGDisplayVar := ["Type Lane", "Type Left_Bounded", "Type Right_Bounded", "Type Connection", "Type Bidirectional", "Type Roundabout", "Type Guide"]
 global ININame := BuildIniName()
@@ -91,6 +93,7 @@ global camDisable2 := 0
 
 global NumHotkeys := 10
 global LINumHotkeys := 17
+global LINumHotkeysAdd := 0
 global RENumHotkeys := 6
 global LGNumHotkeys := 7
 global SVASENumHotkeys := 0
