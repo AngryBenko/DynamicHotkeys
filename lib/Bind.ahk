@@ -1,40 +1,50 @@
 detectClash(type, tmp) { ; only compare if HK is not empty
 	if (type == 1) {
 		Loop % (LINumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(LIHotkeyList[A_Index].hkp) == StripPrefix(tmp.hk) || StripPrefix(LIHotkeyList[A_Index].hks) == StripPrefix(tmp.hk)){
+			if (StripPrefix(LIHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(LIHotkeyList[A_Index].hks) == StripPrefix(tmp)){
 				prehkp := LIHotkeyList[A_Index].hkp
 				prehks := LIHotkeyList[A_Index].hks
-				pretmp := tmp.hk
+				pretmp := tmp
 				;FileAppend Pre: %prehkp% | %prehks% | %pretmp%, *
 				return 1
 			}
 		}
 	} else if (type == 2) {
 		Loop % (RENumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(REHotkeyList[A_Index].hkp) == StripPrefix(tmp.hk) || StripPrefix(REHotkeyList[A_Index].hks) == StripPrefix(tmp.hk)){
+			if (StripPrefix(REHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(REHotkeyList[A_Index].hks) == StripPrefix(tmp)){
 				prehkp := REHotkeyList[A_Index].hkp
 				prehks := REHotkeyList[A_Index].hks
-				pretmp := tmp.hk
+				pretmp := tmp
 				;FileAppend Pre: %prehkp% | %prehks% | %pretmp%, *
 				return 1
 			}
 		}
 	} else if (type == 3) {
 		Loop % (LGNumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(LGHotkeyList[A_Index].hkp) == StripPrefix(tmp.hk) || StripPrefix(LGHotkeyList[A_Index].hks) == StripPrefix(tmp.hk)){
+			if (StripPrefix(LGHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(LGHotkeyList[A_Index].hks) == StripPrefix(tmp)){
 				prehkp := LGHotkeyList[A_Index].hkp
 				prehks := LGHotkeyList[A_Index].hks
-				pretmp := tmp.hk
+				pretmp := tmp
 				;FileAppend Pre: %prehkp% | %prehks% | %pretmp%, *
 				return 1
 			}
 		}
 	} else if (type == 4) {
 		Loop % (SVASENumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(SVASEHotkeyList[A_Index].hkp) == StripPrefix(tmp.hk) || StripPrefix(SVASEHotkeyList[A_Index].hks) == StripPrefix(tmp.hk)){
+			if (StripPrefix(SVASEHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(SVASEHotkeyList[A_Index].hks) == StripPrefix(tmp)){
 				prehkp := SVASEHotkeyList[A_Index].hkp
 				prehks := SVASEHotkeyList[A_Index].hks
-				pretmp := tmp.hk
+				pretmp := tmp
+				;FileAppend Pre: %prehkp% | %prehks% | %pretmp%, *
+				return 1
+			}
+		}
+	} else if (type == 5) {
+		Loop % (CuboidsNumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
+			if (StripPrefix(CuboidsHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(CuboidsHotkeyList[A_Index].hks) == StripPrefix(tmp)){
+				prehkp := CuboidsHotkeyList[A_Index].hkp
+				prehks := CuboidsHotkeyList[A_Index].hks
+				pretmp := tmp
 				;FileAppend Pre: %prehkp% | %prehks% | %pretmp%, *
 				return 1
 			}
@@ -75,6 +85,13 @@ applyKeybind(type, select, outhk, HKControlType, ctrlnum) {
 			tmp := {hkp: SVASEHotkeyList[ctrlnum].hkp, typep: SVASEHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
 		}
 		SVASEHotkeyList[ctrlnum] := tmp
+	} else if (type == 5) {
+		if (select == 1) { ; select primary or secondary
+			tmp := {hkp: outhk, typep: HKControlType, hks: CuboidsHotkeyList[ctrlnum].hks, types: CuboidsHotkeyList[ctrlnum].types, status: 0}
+		} else {
+			tmp := {hkp: CuboidsHotkeyList[ctrlnum].hkp, typep: CuboidsHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
+		}
+		CuboidsHotkeyList[ctrlnum] := tmp
 	}
 	return
 }
@@ -193,7 +210,7 @@ Bind(ctrlnum, select){
 			prevent := 3
 		}
 
-		clash := detectClash(HKVersionType, tmp)
+		clash := detectClash(HKVersionType, outhk)
 
 		if (prevent == 1) {
 			msgbox 'Enter' key is reserved for special keybind. Exiting...
@@ -213,9 +230,9 @@ Bind(ctrlnum, select){
 		}
 		UpdateHotkeyControls()
 		; Rebuild rest of hotkey object, save settings etc
-		OptionChanged()
+		;OptionChanged()
 		; Write settings to INI file
-		;SaveSettings()
+		SaveSettings()
 
 		; Update the GUI control
 		;UpdateHotkeyControls()

@@ -1,4 +1,5 @@
 ; Try to separate main gui from secondary gui
+; ModCheck was removed to allow customize modifiers
 
 drawMainGUI() {
     global
@@ -32,7 +33,7 @@ drawHeaderGUI() {
 	Gui, MainGui: Add, Text, cBlack y5, %general%
 	Gui, MainGui: Font, s9 bold, Segoe UI
 	Gui, MainGui: Add, Text, cBlack y5 xp+380, Workflow:
-	Gui, MainGui: Add, DropDownList, vWorkflow gWorkflow yp xp+65, Line|RE|LG|SVA/SE
+	Gui, MainGui: Add, DropDownList, vWorkflow gWorkflow yp xp+65, Line|RE|LG|SVA/SE|Cuboids
 	Gui, MainGui: Font, s9 bold, Segoe UI
 	Gui, MainGui: Add, Text, cBlack x11 y65, %important%
 	Gui, MainGui: Font, s10 normal, Segoe UI
@@ -56,7 +57,9 @@ drawMainWorkflowGUI() {
 		drawMainLGGUI()
 	} else if (workflowCheck == "SVA/SE") { ; SVA/SE
 		drawMainSVASEGUI()
-	}
+	} else if (workflowCheck == "Cuboids") {
+        drawMainCuboidsGUI()
+    }
 	return
 }
 
@@ -68,7 +71,6 @@ drawMainLIGUI() {
 		} else {
 			displayType := LIDisplayVar[A_Index]
 		}
-
         
         Gui, MainGui: Font, s10, Segoe UI
 
@@ -173,9 +175,9 @@ drawMainLGGUI() {
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index == LGNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;;;;;;;;
+            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;;
         } else {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;;;;;;;
+            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;;
         }
 
         Gui, MainGui: Font, s8, Segoe UI
@@ -217,9 +219,9 @@ drawMainSVASEGUI() {
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index == SVASENumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;;;;;;;;
+            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;;
         } else {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;;;;;;;
+            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;;
         }
 
         Gui, MainGui: Font, s8, Segoe UI
@@ -235,6 +237,50 @@ drawMainSVASEGUI() {
 		ypos += 25
 	}
 	return
+}
+
+drawMainCuboidsGUI() {
+    global
+    Loop % (CuboidsNumHotkeys + NumHotkeys) {
+        if (A_Index > CuboidsNumHotkeys) {
+			displayType := DisplayVar[A_Index - CuboidsNumHotkeys]
+		} else {
+			displayType := CuboidsDisplayVar[A_Index]
+		}
+
+        Gui, MainGui: Font, s10, Segoe UI
+
+        if (A_Index == CuboidsNumHotkeys + NumHotkeys) {
+            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Special)
+        } else if (A_Index <= CuboidsNumHotkeys) {
+            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Cuboids)
+        } else {
+            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Misc)
+        }
+
+        Gui, MainGui: Font, s8, Segoe UI
+        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName1%A_Index% w110 yp-1 xp+60 , None
+        Gui, MainGui: Font, s10, Segoe UI
+
+        if (A_Index == CuboidsNumHotkeys + NumHotkeys) {
+            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;
+        } else {
+            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;
+        }
+
+        Gui, MainGui: Font, s8, Segoe UI
+        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName2%A_Index% w80 yp-1 xp+28, None
+        Gui, MainGui: Font, s10, Segoe UI
+
+        if (A_Index != CuboidsNumHotkeys + NumHotkeys) {
+            Gui, MainGui: Add, Text, cBlack y%ypos% xp+128, %displayType%
+        } else {
+            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit yp xp+100, Custom|MSTeam Mute
+        }
+
+		ypos += 25
+    }
+    return
 }
 
 destroy1GUI() {

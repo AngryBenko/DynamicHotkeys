@@ -22,9 +22,15 @@ searchHotkey(verType){
 				return %A_Index%
 			}
 		}
-	} else if (VerType == 4) {
+	} else if (verType == 4) {
 		Loop % (SVASENumHotkeys + NumHotkeys) {
 			if (SVASEHotkeyList[A_Index].hkp == StripPrefix(temp) || SVASEHotkeyList[A_Index].hks == StripPrefix(temp)) {
+				return %A_Index%
+			}
+		}
+	} else if (verType == 5) {
+		Loop % (CuboidsNumHotkeys + NumHotkeys) {
+			if (CuboidsHotkeyList[A_Index].hkp == StripPrefix(temp) || CuboidsHotkeyList[A_Index].hks == StripPrefix(temp)) {
 				return %A_Index%
 			}
 		}
@@ -64,7 +70,14 @@ shortcutAutoDist(verType) {
 		if (labelNum > SVASENumHotkeys) {
 			globalShortcut(labelNum - SVASENumHotkeys)
 		} else {
-			
+			shortcut(labelNum)
+		}
+	} else if (verType == 5) {
+		if (labelNum > CuboidsNumHotkeys) { ; Cuboids uses letters
+			globalShortcut(labelNum - CuboidsNumHotkeys)
+		} else {
+			cuboidShortcut(labelnum)
+			;shortcut(labelNum)
 		}
 	}
 	; LG, shortct()
@@ -139,7 +152,36 @@ globalShortcut(x) {
 	return
 }
 
-shortcut(x) {
+cuboidShortcut(x) {
+	y := x
+	if (x == 10) {
+		y := 0
+	} else if (x == 11) {
+		y := "a"
+	} else if (x == 12) {
+		y := "b"
+	} else if (x == 13) {
+		y := "c"
+	} else if (x == 14) {
+		y := "d"
+	} else if (x == 15) {
+		y := "e"
+	} else if (x == 16) {
+		y := "f"
+	} else if (x == 17) {
+		y := "g"
+	} else if (x == 18) { ; Cuboids 'J' results in Unknown
+		y := "h"
+	} else if (x == 19) {
+		y := "i"
+	} else if (x == 20) {
+		y := "l"
+	}
+	SendInput, .1%y%
+	return
+}
+
+shortcut(x) { ; Check if x is number
 	y := x + 1
 	SendInput, .1%y%
 	;msgbox Pressed shortcut %x%
@@ -155,7 +197,10 @@ special() {
 		sec := LGHotkeyList[LGNumHotkeys + NumHotkeys].hks
 	} else if (workflowCheck == "SVA/SE") {
 		sec := SVASEHotkeyList[SVASENumHotkeys + NumHotkeys].hks
+	} else if (workflowCheck == "Cuboids") {
+		sec := CuboidsHotkeyList[CuboidsNumHotkeys + NumHotkeys].hks
 	}
+
 	if (sec == "") {
 		msgbox (Special) secondary keybind must not be empty...
 	} else {

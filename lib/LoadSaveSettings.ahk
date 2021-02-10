@@ -63,6 +63,20 @@ SaveSettings(){
 			iniwrite, %types%, %ININame%, SVASEHotkeys, hk_%A_Index%_types
 		}
 	}
+	if (workflowCheck == "Cuboids" || firstRun == 1) {
+		Loop % (CuboidsNumHotkeys + NumHotkeys) {
+			hkp := CuboidsHotkeyList[A_Index].hkp
+			typep := CuboidsHotkeyList[A_Index].typep
+			hks := CuboidsHotkeyList[A_Index].hks
+			types := CuboidsHotkeyList[A_Index].types
+
+			iniwrite, %A_Index%, %ININame%, CuboidsHotkeys, hk_%A_Index%_num
+			iniwrite, %hkp%, %ININame%, CuboidsHotkeys, hk_%A_Index%_hkp
+			iniwrite, %typep%, %ININame%, CuboidsHotkeys, hk_%A_Index%_typep
+			iniwrite, %hks%, %ININame%, CuboidsHotkeys, hk_%A_Index%_hks
+			iniwrite, %types%, %ININame%, CuboidsHotkeys, hk_%A_Index%_types
+		}
+	}
 	return
 }
 
@@ -165,6 +179,27 @@ LoadSettings(){
 		} else if (vals != "ERROR") {
 			IniRead, types, %ININame%, SVASEHotkeys, hk_%A_Index%_types, 0
 			SVASEHotkeyList[A_Index] := {hkp: "", typep: "", hks: vals, types: types, status: 0}
+		}
+	}
+
+	Loop % (CuboidsNumHotkeys + NumHotkeys) {
+		CuboidsHotkeyList[A_Index] := DefaultHKObject
+		IniRead, num, %ININame%, CuboidsHotkeys, hk_%A_Index%_num,
+		IniRead, valp, %ININame% , CuboidsHotkeys, hk_%A_Index%_hkp,
+		IniRead, typep, %ININame%, CuboidsHotkeys, hk_%A_Index%_typep,
+		IniRead, vals, %ININame% , CuboidsHotkeys, hk_%A_Index%_hks,
+		IniRead, types, %ININame%, CuboidsHotkeys, hk_%A_Index%_types,
+		if (valp != "ERROR" && vals != "ERROR"){
+			;IniRead, block, %ININame% , CuboidsHotkeys, hk_%A_Index%_block, 0
+			IniRead, typep, %ININame%, CuboidsHotkeys, hk_%A_Index%_typep, 0
+			IniRead, types, %ININame%, CuboidsHotkeys, hk_%A_Index%_types, 0
+			CuboidsHotkeyList[A_Index] := {hkp: valp, typep: typep, hks: vals, types: types, status: 0}
+		} else if (valp != "ERROR") {
+			IniRead, typep, %ININame%, CuboidsHotkeys, hk_%A_Index%_typep, 0
+			CuboidsHotkeyList[A_Index] := {hkp: valp, typep: typep, hks: "", types: "", status: 0}
+		} else if (vals != "ERROR") {
+			IniRead, types, %ININame%, CuboidsHotkeys, hk_%A_Index%_types, 0
+			CuboidsHotkeyList[A_Index] := {hkp: "", typep: "", hks: vals, types: types, status: 0}
 		}
 	}
 

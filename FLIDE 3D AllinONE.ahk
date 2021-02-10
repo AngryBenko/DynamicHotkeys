@@ -8,6 +8,10 @@
 TODO:
 - GUI:
 	- Have global shortcuts moved to a second "column"
+- Remove ModifyOptions
+- DisableHotkeys not working during EditKeybinds
+- Clash not working for keys already bounded
+- Relook into prefix
 */
 
 #Include, %A_ScriptDir%\lib\hotkeyAction.ahk
@@ -43,6 +47,7 @@ TODO:
 ;----------------------------
 ; Build list of "End Keys" for Input command
 global EXTRA_KEY_LIST := "{Escape}"	; DO NOT REMOVE! - Used to quit binding
+global EXTRA_KEY_LIST .= "{Ins}"
 ; Standard non-printables
 ;global EXTRA_KEY_LIST .= "{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}{Left}{Right}{Up}{Down}"
 ;global EXTRA_KEY_LIST .= "{Home}{End}{PgUp}{PgDn}{Del}{Ins}{BackSpace}{Pause}"
@@ -75,14 +80,21 @@ global Title := "FLIDE 3D Helper v2.0"
 global VersionVar := ["HotkeyList", "LIHotkeyList", "REHotkeyList", "LGHotkeyList", "SVASEHotkeyList"]
 global DisplayVar := ["Spline", "Connection Tool", "Reverse Direction", "Reverse Region", "Satellite Tube", "Google Tiles", "Windows Snapshot", "Camera Forward", "Camera Backward"]
 global LIDisplayVar := ["Double Solid Yellow Median", "Solid Yellow Median", "Dashed White", "Solid White Shoulder", "Solid White Line Crosswalk", "Solid White Line Crosswalk/Intersection", "Crosswalk Crosswalk-Region", "Crosswalk Crosswalk/Intersection", "Double Solid Yellow Bidirectional", "Inferred Parking", "Dashed Solid Yellow Suicide", "Solid White Bike Region", "Solid White Bike/Shoulder", "Short Dashed Normal", "Short Dashed Bike", "Short Dashed Shoulder", "Solid White Intersection"]
-global LIDisplayVarAdd := []
+global LIDisplayVarAdd := ["Solid White Parking", "Inferred Shoulder/Parking", "Inferred Cross/'Unknown", "Inferred CW/Parking", "Reversible Parking Line", "Dashed Bidirectional Yellow Line", "Solid Bidirectional White Line", "Solid Bidirecttional Yellow Line"]
 global REDisplayVar := ["Road Boundary", "Median Flow-Separating", "Median Flow-Same", "Intersection Island", "Roundabout", "Under_Roof"]
 global LGDisplayVar := ["Type Lane", "Type Left_Bounded", "Type Right_Bounded", "Type Connection", "Type Bidirectional", "Type Roundabout", "Type Guide"]
+/*
+.12 - .1l
+
+.11, .1j = Unknown
+*/
+global CuboidsDisplayVar := ["Unknown", "Car", "MiniVan", "SUV", "Van", "Small_Truck", "Large_Truck", "Pickup", "Bus", "Animal", "Trailer", "Scooter", "Skateboard", "Wheelchair", "Other", "Bicycle", "Motorbike", "Pedestrian", "Train"]
 global ININame := BuildIniName()
 global LIHotkeyList := []
 global REHotkeyList := []
 global LGHotkeyList := []
 global SVASEHotkeyList := []
+global CuboidsHotkeyList := []
 
 global modCheck := 2
 global specialCheck := 2
@@ -93,10 +105,11 @@ global camDisable2 := 0
 
 global NumHotkeys := 10
 global LINumHotkeys := 17
-global LINumHotkeysAdd := 0
+global LINumHotkeysAdd := 8
 global RENumHotkeys := 6
 global LGNumHotkeys := 7
 global SVASENumHotkeys := 0
+global CuboidsNumHotkeys := 19
 
 
 global ypos := 105
@@ -203,6 +216,7 @@ EditGuiGuiClose:
 	editText := ""
 	EnableHotkeys()
 	Gui, EditGui: Destroy ; We cannot recreate the same gui. We must destroy or redisplay it.
+	Reload
 	return
 
 MainGuiGuiClose:
@@ -242,7 +256,7 @@ CamCheck:
 	UpdateHotkeyControls()
 	return
 
-ModCheck:
+ModCheck: ; ModCheck Removed
 	global modCheck
 
 	Gui, Submit, NoHide
@@ -254,7 +268,7 @@ ModCheck:
 		GuiControl, MainGui: Disable, Button%A_Index%
 	}
 	DisableHotkeys()
-	ModifyOptions()
+	ModifyOptions() ; Function removed
 	UpdateHotkeyControls()
 	SaveSettings()
 	EnableHotkeys()
@@ -297,6 +311,10 @@ DoHotkey4:
 	shortcutAutoDist(substr(A_ThisLabel, 9))
 	return
 
+DoHotkey5:
+	shortcutAutoDist(substr(A_ThisLabel, 9))
+	return
+
 TeamsMute:
 	teamsmute()
 	;msgbox TEAMSMUTE
@@ -321,7 +339,9 @@ Reset:
 	DeleteHotKey(substr(A_GuiControl, 7))
 	return
 
-
+HKEnable:
+	;HKEnable(substr(A_GuiControl, 10,))
+	return
 
 EscapeReleased:
 	hotkey, Escape up, EscapeReleased, OFF
@@ -340,6 +360,7 @@ EscapeReleased:
 		return
 	
 	; Detect up of modifier keys
+	/*
 	*xbutton2 up::
 	*xbutton1 up::
 	*mbutton up::
@@ -355,7 +376,7 @@ EscapeReleased:
 
 		SetModifier(mod, 0)
 		return
-
+	*/
 	/*
 	xbutton1::
 	xbutton2::
