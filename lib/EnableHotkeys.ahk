@@ -180,6 +180,49 @@ EnableHotkeys(){
 				SVASEHotkeyList[A_Index].status := 1
 			}
 		}
+	} else if (workflowCheck == "Cuboids") {
+		Loop % (CuboidsNumHotkeys + NumHotkeys){ ; ALways enable global
+			status := CuboidsHotkeyList[A_Index].status
+			hkp := CuboidsHotkeyList[A_Index].hkp
+			hks := CuboidsHotkeyList[A_Index].hks
+			if ((hkp != "" || hks != "") && status == 0){
+				;FileAppend ENABLE`n, *
+				;FileAppend hkp: %hkp%`n, *
+				;FileAppend hks: %hks%`n, *
+				prefix := BuildPrefix(CuboidsHotkeyList[A_Index])
+				if (A_Index != (CuboidsNumHotkeys + NumHotkeys)) {
+					if (hkp != "" && hks != "") {
+						hotkey, %prefix%%hkp%, DoHotkey5, ON
+						hotkey, %prefix%%hks%, DoHotkey5, ON
+					} else if (hkp != "") {
+						;prefix := BuildPrefix(CuboidsHotkeyList[A_Index])
+						;Msgbox % "ADDING: " prefix "," hk
+						hotkey, %prefix%%hkp%, DoHotkey5, ON
+						;hotkey, %prefix%%hks%, DoHotkey%A_Index%, ON
+					} else if (hks != "") {
+						;prefix := BuildPrefix(CuboidsHotkeyList[A_Index])
+						;Msgbox % "ADDING: " prefix "," hk
+						;hotkey, %prefix%%hkp%, DoHotkey%A_Index%, ON
+						hotkey, %prefix%%hks%, DoHotkey5, ON
+					}
+				} else {
+					if (hkp != "") {
+						if (specialCheck == 2) {
+							if (hks != "") {
+								hotkey, %hkp% & %hks%, TeamsMute, ON
+							} else {
+								hotkey, %hkp%, TeamsMute, ON
+							}
+						} else {
+							hotkey, %hkp%, DoHotkey5, ON
+						}
+						
+						;hotkey, %prefix%%hkp%, DoHotkey%A_Index%, ON
+					}
+				}
+				CuboidsHotkeyList[A_Index].status := 1
+			}
+		}
 	}
 	
 	return

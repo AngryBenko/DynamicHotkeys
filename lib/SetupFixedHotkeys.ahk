@@ -11,6 +11,8 @@ SetupFixedHotKeys() {
 	LGHotkeyList[(LGNumHotkeys + NumHotkeys) - 1] := tmp2
 	SVASEHotkeyList[(SVASENumHotkeys + NumHotkeys) - 2] := tmp1
 	SVASEHotkeyList[(SVASENumHotkeys + NumHotkeys) - 1] := tmp2
+	CuboidsHotkeyList[(CuboidsNumHotkeys + NumHotkeys) - 2] := tmp1
+	CuboidsHotkeyList[(CuboidsNumHotkeys + NumHotkeys) - 1] := tmp2
 	
 	;OptionChanged()
 	;UpdateHotkeyControls()

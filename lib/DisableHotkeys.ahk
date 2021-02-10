@@ -1,8 +1,8 @@
-
+; Does not disable hotkeys when editing current workflow
 ; Disables User-Defined Hotkeys
 DisableHotkeys(){
 	
-	if (prevWFCheck == "Line") {
+	if (prevWFCheck == "Line" || workflowCheck == "Line") {
 		Loop % (LINumHotkeys + NumHotkeys){ ; global
 			status := LIHotkeyList[A_Index].status
 			hkp := LIHotkeyList[A_Index].hkp
@@ -46,7 +46,7 @@ DisableHotkeys(){
 				LIHotkeyList[A_Index].status := 0
 			}
 		}
-	} else if (prevWFCheck == "RE") {
+	} else if (prevWFCheck == "RE" || workflowCheck == "RE") {
 		Loop % (RENumHotkeys + NumHotkeys){ ; global
 			status := REHotkeyList[A_Index].status
 			hkp := REHotkeyList[A_Index].hkp
@@ -90,7 +90,7 @@ DisableHotkeys(){
 				REHotkeyList[A_Index].status := 0
 			}
 		}
-	} else if (prevWFCheck == "LG") {
+	} else if (prevWFCheck == "LG" || workflowCheck == "LG") {
 		Loop % (LGNumHotkeys + NumHotkeys){ ; global
 			status := LGHotkeyList[A_Index].status
 			hkp := LGHotkeyList[A_Index].hkp
@@ -132,7 +132,7 @@ DisableHotkeys(){
 				LGHotkeyList[A_Index].status := 0
 			}
 		}
-	} else if (prevWFCheck == "SVA/SE") {
+	} else if (prevWFCheck == "SVA/SE" || workflowCheck == "SVA/SE") {
 		Loop % (SVASENumHotkeys + NumHotkeys){ ; global
 			status := SVASEHotkeyList[A_Index].status
 			hkp := SVASEHotkeyList[A_Index].hkp
@@ -172,6 +172,48 @@ DisableHotkeys(){
 					}
 				}
 				SVASEHotkeyList[A_Index].status := 0
+			}
+		}
+	} else if (prevWFCheck == "Cuboids" || workflowCheck == "Cuboids") {
+		Loop % (CuboidsNumHotkeys + NumHotkeys){ ; global
+			status := CuboidsHotkeyList[A_Index].status
+			hkp := CuboidsHotkeyList[A_Index].hkp
+			hks := CuboidsHotkeyList[A_Index].hks
+			if ((hkp != "" || hks != "")){
+				;FileAppend DISABLE`n, *
+				;FileAppend hkp: %hkp%`n, *
+				;FileAppend hks: %hks%`n, *
+				prefix := BuildPrefix(CuboidsHotkeyList[A_Index])
+				if (A_Index != (CuboidsNumHotkeys + NumHotkeys)) {
+					if (hkp != "" && hks != "") {
+						;Msgbox % "REMOVING: " prefix "," hk
+						hotkey, %prefix%%hkp%, DoHotkey5, OFF
+						hotkey, %prefix%%hks%, DoHotkey5, OFF
+						;hotkey, %prefix%%hks%, DoHotkey%A_Index%, OFF
+						;hotkey, %hk%, DoHotkey%A_Index%, OFF
+					} else if (hkp != "") {
+						;Msgbox % "REMOVING: " prefix "," hk
+						;hotkey, %prefix%%hkp%, DoHotkey%A_Index%, OFF
+						hotkey, %prefix%%hkp%, DoHotkey5, OFF
+						;hotkey, %hk%, DoHotkey%A_Index%, OFF
+					} else if (hks != "") {
+						;FileAppend special: %hks%`n, *
+						;hotkey, %hkp%, DoHotkey%A_Index%, OFF
+						hotkey, %prefix%%hks%, DoHotkey5, OFF
+					}
+				} else {
+					if (hkp != "") {
+						if (specialCheck == 2) {
+							if (hks != "") {
+								hotkey, %hkp% & %hks%, TeamsMute, OFF
+							} else {
+								hotkey, %hkp%, TeamsMute, OFF
+							}
+						}
+						hotkey, %hkp%, DoHotkey5, OFF
+					}
+				}
+				CuboidsHotkeyList[A_Index].status := 0
 			}
 		}
 	}

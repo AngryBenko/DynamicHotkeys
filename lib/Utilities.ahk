@@ -9,6 +9,8 @@ guiHeightModifier() {
 		return ((NumHotkeys + LGNumHotkeys) * mult) + fixedHeight
 	} else if (workflowCheck == "SVA/SE") {
 		return ((NumHotkeys + SVASENumHotkeys) * mult) + fixedHeight
+	} else if (workflowCheck == "Cuboids") {
+		return ((NumHotkeys + CuboidsNumHotkeys) * mult) + fixedHeight
 	}
 }
 
@@ -38,6 +40,8 @@ DeleteHotkey(hk){
 		LGHotkeyList[hk] := DefaultHKObject
 	} else if (HKVersionType == 4) {
 		SVASEHotkeyList[hk] := DefaultHKObject
+	} else if (HKVersionType == 5) {
+		CuboidsHotkeyList[hk] := DefaultHKObject
 	}
 
 	
@@ -156,6 +160,7 @@ BuildHotKeyName(hk, ctrltype){
 	stringupper, hk, hk
 	;FileAppend, %ctrltype%, *
 	if (hk != "") {
+		outstr := hk
 		if (ctrltype == 5) { ; Fixed hotkey
 			tmp2 := substr(hk, 7)
 			outstr := "Alt + "

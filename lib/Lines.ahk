@@ -1,3 +1,16 @@
+/*
+List of uncommon:
+Triangle yield and int region
+solid white with parking
+inferred parking with shoulder/parking
+inferred parking cross/unknown traffic directions
+inferred parking crosswalk/parking
+reversible line with parking
+bidirectional yellow dashed line
+bidirectional solid white line
+bidiretional solid yellow line
+*/
+
 dashedWhite() { ; dashed white line
     SendInput, .13
     SendInput, .22
@@ -110,7 +123,7 @@ intGuidingLine() { ; intersectio guiding line (requires semantics update)
     SendInput, .70
 }
 
-dashedSolidYellowSuicideRF() { ; dashed yellow suicide region facing
+dashedSolidYellowSuicideRF() { ; dashed solid yellow suicide region facing
     SendInput, .14
     SendInput, .23
     SendInput, .42
