@@ -19,7 +19,13 @@ drawEditGUI() {
 
     Gui, EditGui: Add, Button, gCloseEdit vCloseEdit xp+25 yp+35, Save
 	;height := height + 60
-	Gui, EditGui: Show, Center w700 h%height% x%xx% y%yy%, Edit Keybinds
+    if (workflowCheck == "Cuboids") {
+        height := ((NumHotkeys + CuboidsNumHotkeys) * 25) + 150
+        Gui, EditGui: Show, Center w700 h%height% x%xx% y%yy%, Edit Keybinds
+    } else {
+        Gui, EditGui: Show, Center w700 h%height% x%xx% y%yy%, Edit Keybinds
+    }
+	
 
 	LoadSettings()
     return

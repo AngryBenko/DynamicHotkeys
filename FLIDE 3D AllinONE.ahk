@@ -113,8 +113,11 @@ global CuboidsNumHotkeys := 19
 
 
 global ypos := 105
+global ypos2 := 80
+global xOffset := 0
 
 height := 0
+width := 0
 
 ; Create the GUI, using a Loop feature that auto updates the GUI
 
@@ -125,6 +128,7 @@ height := 0
 init()
 ; call heightmod
 height := guiHeightModifier()
+width := guiWidthModifier()
 /*
 drawHeaderGUI()
 
@@ -212,11 +216,10 @@ HelpGuiGuiClose:
 
 CloseEdit:
 EditGuiGuiClose:
-
 	editText := ""
 	EnableHotkeys()
 	Gui, EditGui: Destroy ; We cannot recreate the same gui. We must destroy or redisplay it.
-	Reload
+	;Reload
 	return
 
 MainGuiGuiClose:

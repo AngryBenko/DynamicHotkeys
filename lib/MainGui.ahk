@@ -13,10 +13,11 @@ drawMainGUI() {
     important := "Please do not close this window for the script to work in the background!"
 
     drawHeaderGUI()
+    ;xOffset := StrLen(workflowCheck)
     drawMainWorkflowGUI()
 
     Gui, MainGui: +Resize -MaximizeBox
-	Gui, MainGui: Show, Center w600 h%height% , %Title%
+	Gui, MainGui: Show, Center w900 h%height% , %Title%
     return
 }
 
@@ -32,17 +33,17 @@ drawHeaderGUI() {
 	Gui, MainGui: Font, s9 normal, Segoe UI
 	Gui, MainGui: Add, Text, cBlack y5, %general%
 	Gui, MainGui: Font, s9 bold, Segoe UI
-	Gui, MainGui: Add, Text, cBlack y5 xp+380, Workflow:
+	Gui, MainGui: Add, Text, cBlack y5 xp+675, Workflow:
 	Gui, MainGui: Add, DropDownList, vWorkflow gWorkflow yp xp+65, Line|RE|LG|SVA/SE|Cuboids
 	Gui, MainGui: Font, s9 bold, Segoe UI
 	Gui, MainGui: Add, Text, cBlack x11 y65, %important%
 	Gui, MainGui: Font, s10 normal, Segoe UI
-	Gui, MainGui: Add, Text, cBlack yp+20 x60, Primary
+	Gui, MainGui: Add, Text, cBlack yp+20 x90, Primary
 	Gui, MainGui: Add, Text, cBlack yp xp+125, Secondary
 	;Gui, MainGui: Add, Radio, vModGroup gModCheck Group yp xp+150 , Middle
 	;Gui, MainGui: Add, Radio, gModCheck yp xp+70 Checked , Thumb1
 	;Gui, MainGui: Add, Radio, gModCheck yp xp+80 , Thumb2
-	;Gui, MainGui:+AlwaysOnTop
+	Gui, MainGui:+AlwaysOnTop
 
 	return
 }
@@ -251,34 +252,46 @@ drawMainCuboidsGUI() {
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index == CuboidsNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Special)
+            Gui, MainGui: Add, Text, cBlack x450 y%ypos2%, (Special)
         } else if (A_Index <= CuboidsNumHotkeys) {
             Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Cuboids)
         } else {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Misc)
+            Gui, MainGui: Add, Text, cBlack x450 y%ypos2%, (Misc)
         }
 
         Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName1%A_Index% w110 yp-1 xp+60 , None
+        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName1%A_Index% w90 yp-1 xp+65 , None
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index == CuboidsNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;
+            Gui, MainGui: Add, Text, cBlack y%ypos2% xp+100, =/+ ;
         } else {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;
+            if (A_Index > CuboidsNumHotkeys){
+                Gui, MainGui: Add, Text, cBlack y%ypos2% xp+100, OR ;
+            } else {
+                Gui, MainGui: Add, Text, cBlack y%ypos% xp+100, OR ;
+            }
         }
 
         Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName2%A_Index% w80 yp-1 xp+28, None
+        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName2%A_Index% w90 yp-1 xp+28, None
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index != CuboidsNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+128, %displayType%
+            if (A_Index > CuboidsNumHotkeys) {
+                Gui, MainGui: Add, Text, cBlack y%ypos2% xp+95, %displayType%
+            } else {
+                Gui, MainGui: Add, Text, cBlack y%ypos% xp+95, %displayType%
+            }
         } else {
             Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit yp xp+100, Custom|MSTeam Mute
         }
 
-		ypos += 25
+        if (A_Index >= CuboidsNumHotkeys) {
+            ypos2 += 25
+        } else {
+            ypos += 25
+        }
     }
     return
 }
@@ -286,6 +299,7 @@ drawMainCuboidsGUI() {
 destroy1GUI() {
 	global
 	ypos := 105
+    ypos2 := 80
     general := ""
 	Gui, MainGui: Destroy
 	return
