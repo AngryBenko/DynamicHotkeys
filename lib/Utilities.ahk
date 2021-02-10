@@ -10,7 +10,23 @@ guiHeightModifier() {
 	} else if (workflowCheck == "SVA/SE") {
 		return ((NumHotkeys + SVASENumHotkeys) * mult) + fixedHeight
 	} else if (workflowCheck == "Cuboids") {
-		return ((NumHotkeys + CuboidsNumHotkeys) * mult) + fixedHeight
+		return ((CuboidsNumHotkeys) * mult) + fixedHeight
+	}
+}
+
+guiWidthModifier() {
+	mult := 25
+	fixedWidth := 0
+	if (workflowCheck == "Line") {
+		return ((NumHotkeys + LINumHotkeys) * mult)
+	} else if (workflowCheck == "RE") {
+		return ((NumHotkeys + RENumHotkeys) * mult)
+	} else if (workflowCheck == "LG") {
+		return ((NumHotkeys + LGNumHotkeys) * mult)
+	} else if (workflowCheck == "SVA/SE") {
+		return ((NumHotkeys + SVASENumHotkeys) * mult)
+	} else if (workflowCheck == "Cuboids") {
+		return ((NumHotkeys + CuboidsNumHotkeys) * mult) 
 	}
 }
 

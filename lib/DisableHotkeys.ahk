@@ -1,7 +1,5 @@
-; Does not disable hotkeys when editing current workflow
 ; Disables User-Defined Hotkeys
 DisableHotkeys(){
-	
 	if (prevWFCheck == "Line" || workflowCheck == "Line") {
 		Loop % (LINumHotkeys + NumHotkeys){ ; global
 			status := LIHotkeyList[A_Index].status
@@ -46,7 +44,9 @@ DisableHotkeys(){
 				LIHotkeyList[A_Index].status := 0
 			}
 		}
-	} else if (prevWFCheck == "RE" || workflowCheck == "RE") {
+	}
+	
+	if (prevWFCheck == "RE" || workflowCheck == "RE") {
 		Loop % (RENumHotkeys + NumHotkeys){ ; global
 			status := REHotkeyList[A_Index].status
 			hkp := REHotkeyList[A_Index].hkp
@@ -90,7 +90,9 @@ DisableHotkeys(){
 				REHotkeyList[A_Index].status := 0
 			}
 		}
-	} else if (prevWFCheck == "LG" || workflowCheck == "LG") {
+	}
+	
+	if (prevWFCheck == "LG" || workflowCheck == "LG") {
 		Loop % (LGNumHotkeys + NumHotkeys){ ; global
 			status := LGHotkeyList[A_Index].status
 			hkp := LGHotkeyList[A_Index].hkp
@@ -132,7 +134,9 @@ DisableHotkeys(){
 				LGHotkeyList[A_Index].status := 0
 			}
 		}
-	} else if (prevWFCheck == "SVA/SE" || workflowCheck == "SVA/SE") {
+	}
+	
+	if (prevWFCheck == "SVA/SE" || workflowCheck == "SVA/SE") {
 		Loop % (SVASENumHotkeys + NumHotkeys){ ; global
 			status := SVASEHotkeyList[A_Index].status
 			hkp := SVASEHotkeyList[A_Index].hkp
@@ -174,15 +178,14 @@ DisableHotkeys(){
 				SVASEHotkeyList[A_Index].status := 0
 			}
 		}
-	} else if (prevWFCheck == "Cuboids" || workflowCheck == "Cuboids") {
+	}
+	
+	if (prevWFCheck == "Cuboids" || workflowCheck == "Cuboids") {
 		Loop % (CuboidsNumHotkeys + NumHotkeys){ ; global
 			status := CuboidsHotkeyList[A_Index].status
 			hkp := CuboidsHotkeyList[A_Index].hkp
 			hks := CuboidsHotkeyList[A_Index].hks
-			if ((hkp != "" || hks != "")){
-				;FileAppend DISABLE`n, *
-				;FileAppend hkp: %hkp%`n, *
-				;FileAppend hks: %hks%`n, *
+			if ((hkp != "" || hks != "") && status == 1){
 				prefix := BuildPrefix(CuboidsHotkeyList[A_Index])
 				if (A_Index != (CuboidsNumHotkeys + NumHotkeys)) {
 					if (hkp != "" && hks != "") {
@@ -217,6 +220,5 @@ DisableHotkeys(){
 			}
 		}
 	}
-
 	return
 }

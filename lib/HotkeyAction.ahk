@@ -58,26 +58,26 @@ shortcutAutoDist(verType) {
 		if (labelNum > RENumHotkeys) {
 			globalShortcut(labelNum - RENumHotkeys)
 		} else {
-			shortcut(labelNum)
+			shortcut(labelNum, verType)
 		}
 	} else if (verType == 3) {
 		if (labelNum > LGNumHotkeys) {
 			globalShortcut(labelNum - LGNumHotkeys)
 		} else {
-			shortcut(labelNum)
+			shortcut(labelNum, verType)
 		}
 	} else if (verType == 4) {
 		if (labelNum > SVASENumHotkeys) {
 			globalShortcut(labelNum - SVASENumHotkeys)
 		} else {
-			shortcut(labelNum)
+			shortcut(labelNum, verType)
 		}
 	} else if (verType == 5) {
 		if (labelNum > CuboidsNumHotkeys) { ; Cuboids uses letters
 			globalShortcut(labelNum - CuboidsNumHotkeys)
 		} else {
-			cuboidShortcut(labelnum)
-			;shortcut(labelNum)
+			;cuboidShortcut(labelnum)
+			shortcut(labelNum, verType)
 		}
 	}
 	; LG, shortct()
@@ -153,37 +153,68 @@ globalShortcut(x) {
 }
 
 cuboidShortcut(x) {
-	y := x
-	if (x == 10) {
-		y := 0
-	} else if (x == 11) {
-		y := "a"
-	} else if (x == 12) {
-		y := "b"
-	} else if (x == 13) {
-		y := "c"
-	} else if (x == 14) {
-		y := "d"
-	} else if (x == 15) {
-		y := "e"
-	} else if (x == 16) {
-		y := "f"
-	} else if (x == 17) {
-		y := "g"
-	} else if (x == 18) { ; Cuboids 'J' results in Unknown
-		y := "h"
-	} else if (x == 19) {
-		y := "i"
-	} else if (x == 20) {
-		y := "l"
+	if (verType == 5) {
+		y := x
+		if (x == 10) {
+			y := 0
+		} else if (x == 11) {
+			y := "a"
+		} else if (x == 12) {
+			y := "b"
+		} else if (x == 13) {
+			y := "c"
+		} else if (x == 14) {
+			y := "d"
+		} else if (x == 15) {
+			y := "e"
+		} else if (x == 16) {
+			y := "f"
+		} else if (x == 17) {
+			y := "g"
+		} else if (x == 18) { ; Cuboids 'J' results in Unknown
+			y := "h"
+		} else if (x == 19) {
+			y := "i"
+		} else if (x == 20) {
+			y := "l"
+		}
 	}
-	SendInput, .1%y%
+	;SendInput, .1%y%
+	msgbox Pressed
 	return
 }
 
-shortcut(x) { ; Check if x is number
-	y := x + 1
-	SendInput, .1%y%
+shortcut(x, verType) { ; Check if x is number
+	if (verType == 5) {
+		y := x
+		if (x == 10) {
+			y := 0
+		} else if (x == 11) {
+			y := "a"
+		} else if (x == 12) {
+			y := "b"
+		} else if (x == 13) {
+			y := "c"
+		} else if (x == 14) {
+			y := "d"
+		} else if (x == 15) {
+			y := "e"
+		} else if (x == 16) {
+			y := "f"
+		} else if (x == 17) {
+			y := "g"
+		} else if (x == 18) { ; Cuboids 'J' results in Unknown
+			y := "h"
+		} else if (x == 19) {
+			y := "i"
+		} else if (x == 20) {
+			y := "l"
+		}
+	} else {
+		y := x + 1
+	}
+	;SendInput, .1%y%
+	msgbox Pressed
 	;msgbox Pressed shortcut %x%
 	return
 }
