@@ -11,9 +11,16 @@ drawHelpGUI() {
     Gui, HelpGui: Add, Text, ,%helpText%
     Gui, HelpGui: +AlwaysOnTop
     Gui, HelpGui: Add, Button, gCloseHelp vCloseHelp xp+5 yp+50, Close
-
+    Gui, HelpGui: -MinimizeBox
 
     Gui, HelpGui: Show, x%xxx% y%yyy%
 
+    return
+}
+
+destoryHelpGUI() {
+    global
+    helpText := ""
+	Gui, HelpGui: Destroy
     return
 }

@@ -1,17 +1,13 @@
 #SingleInstance, force
 #NoEnv
 #MaxHotkeysPerInterval 200
-#InstallKeybdHook
-#InstallMouseHook
+#MenuMaskkey vkE8
+;#InstallKeybdHook
+;#InstallMouseHook
 
 /*
 TODO:
-- GUI:
-	- Have global shortcuts moved to a second "column"
-- Remove ModifyOptions
-- DisableHotkeys not working during EditKeybinds
-- Clash not working for keys already bounded
-- Relook into prefix
+- Add support for mmo mouse
 */
 
 #Include, %A_ScriptDir%\lib\hotkeyAction.ahk
@@ -22,7 +18,6 @@ TODO:
 #Include, %A_ScriptDir%\lib\Bind.ahk
 #Include, %A_ScriptDir%\lib\SetupFixedHotkeys.ahk
 #Include, %A_ScriptDir%\lib\LoadSaveSettings.ahk
-#Include, %A_ScriptDir%\lib\ModifyOptions.ahk
 #Include, %A_ScriptDir%\lib\EnableHotkeys.ahk
 #Include, %A_ScriptDir%\lib\DisableHotkeys.ahk
 #Include, %A_ScriptDir%\lib\UpdateHotkeyControls.ahk
@@ -72,13 +67,13 @@ global EXTRA_KEY_LIST .= "{Ins}"
 global HKControlType := 0
 global HKModifierState := {}
 global HKLastHotkey := 0 ; Time that Escape was pressed to exit key binding. Used to determine if Escape is held (Clear binding)
-global DefaultHKObject := {hkp: "", typep: "", hks: "", types: ""}
+global DefaultHKObject := {hkp: "", typep: ""}
 
 ; Misc vars
 global firstRun := 0
 global Title := "FLIDE 3D Helper v2.0"
 global VersionVar := ["HotkeyList", "LIHotkeyList", "REHotkeyList", "LGHotkeyList", "SVASEHotkeyList"]
-global DisplayVar := ["Spline", "Connection Tool", "Reverse Direction", "Reverse Region", "Satellite Tube", "Google Tiles", "Windows Snapshot", "Camera Forward", "Camera Backward"]
+global DisplayVar := ["Spline", "Connection Tool", "Reverse Direction", "Reverse Region", "Satellite Tube", "Google Tiles", "Cursor Mode", "Windows Snapshot", "Camera Forward", "Camera Backward"]
 global LIDisplayVar := ["Double Solid Yellow Median", "Solid Yellow Median", "Dashed White", "Solid White Shoulder", "Solid White Line Crosswalk", "Solid White Line Crosswalk/Intersection", "Crosswalk Crosswalk-Region", "Crosswalk Crosswalk/Intersection", "Double Solid Yellow Bidirectional", "Inferred Parking", "Dashed Solid Yellow Suicide", "Solid White Bike Region", "Solid White Bike/Shoulder", "Short Dashed Normal", "Short Dashed Bike", "Short Dashed Shoulder", "Solid White Intersection"]
 global LIDisplayVarAdd := ["Solid White Parking", "Inferred Shoulder/Parking", "Inferred Cross/'Unknown", "Inferred CW/Parking", "Reversible Parking Line", "Dashed Bidirectional Yellow Line", "Solid Bidirectional White Line", "Solid Bidirecttional Yellow Line"]
 global REDisplayVar := ["Road Boundary", "Median Flow-Separating", "Median Flow-Same", "Intersection Island", "Roundabout", "Under_Roof"]
@@ -89,6 +84,7 @@ global LGDisplayVar := ["Type Lane", "Type Left_Bounded", "Type Right_Bounded", 
 .11, .1j = Unknown
 */
 global CuboidsDisplayVar := ["Unknown", "Car", "MiniVan", "SUV", "Van", "Small_Truck", "Large_Truck", "Pickup", "Bus", "Animal", "Trailer", "Scooter", "Skateboard", "Wheelchair", "Other", "Bicycle", "Motorbike", "Pedestrian", "Train"]
+global CuboidsDisplayVar2 := ["Image Lidar", "Stacked Lidar", "Isolate Cuboid"]
 global ININame := BuildIniName()
 global LIHotkeyList := []
 global REHotkeyList := []
@@ -103,18 +99,21 @@ global prevWFCheck := "Line"
 global camDisable1 := 0
 global camDisable2 := 0
 
-global NumHotkeys := 10
+global NumHotkeys := 11
 global LINumHotkeys := 17
 global LINumHotkeysAdd := 8
 global RENumHotkeys := 6
 global LGNumHotkeys := 7
 global SVASENumHotkeys := 0
 global CuboidsNumHotkeys := 19
+global CuboidsNumHotkeysA := 3
 
 
-global ypos := 105
-global ypos2 := 80
+global ypos := 67
 global xOffset := 0
+
+global atopcheck := 0
+global minclosecheck := 0
 
 height := 0
 width := 0
@@ -148,36 +147,17 @@ EnableHotkeys()
 
 return ;
 
+MinClose:
+	minclosecheck := !minclosecheck
+	updateFileMenu()
+	return
 
-
+ATop:
+	atopcheck := !atopcheck
+	updateFileMenu()
+	return
 
 2ndGui: ;Reduce Gui to functions
-/*
-	Gui, MainGui: +LastFound
-	WinGetPos, xx, yy
-	xx += 10
-	yy += 10
-	DisableHotkeys()
-	editText .= "To edit your keybinds, click on 'Set Primary'.`n"
-	editText .= "Click 'Set Secondary' if you would like a secondary keybind for the same shortcut.`n"
-	editText .= "If you would like to reset the keybinds, click on 'Reset Key'"
-	Gui, EditGui: Font, s8 bold, Segoe UI
-	Gui, EditGui: Add, Text, cBlack y5, %editText%
-	Gui, EditGui: Font, s10 normal, Segoe UI
-	Gui, EditGui: Add, Text, cBlack yp+45 x185, Primary
-	Gui, EditGui: Add, Text, cBlack yp xp+120, Secondary
-	ypos := 70
-	; The GUI that allows editing of keybinds
-
-	drawWorkflowGUI(2)
-	;draw2GUI()
-
-	Gui, EditGui: Add, Button, gCloseEdit vCloseEdit xp+25 yp+35, Save
-	;height := height + 60
-	Gui, EditGui: Show, Center w650 h%height% x%xx% y%yy%, Edit Keybinds
-
-	LoadSettings()
-	*/
 	drawEditGUI()
 	return
 
@@ -185,44 +165,27 @@ MenuHandler:
 	return
 
 Reload:
+	SetupFixedHotKeys()
+	OptionChanged()
 	Reload
 	return
 
 Help:
-	/*
-	Gui, MainGui: +LastFound
-	WinGetPos, xxx, yyy
-	xxx += 100
-	yyy += 100
-	helpText .= "Welcome to FLIDE 3D LG Helper v2.0`n"
-	helpText .= "Please visit the documentation for further information.`n"
-	helpText .= "If you still require further assistance, please reach out to Billy Yu. @bilyu`n"
-	Gui, HelpGui: Add, Text, ,%helpText%
-	Gui, HelpGui: +AlwaysOnTop
-	Gui, HelpGui: Add, Button, gCloseHelp vCloseHelp xp+5 yp+50, Close
-
-
-	Gui, HelpGui: Show, x%xxx% y%yyy%
-	*/
-	;msgbox Hi! I'm Help
 	drawHelpGUI()
 	return
 
 CloseHelp:
 HelpGuiGuiClose:
-	helpText := ""
-	Gui, HelpGui: Destroy
+	destoryHelpGUI()
 	return
 
 CloseEdit:
 EditGuiGuiClose:
-	editText := ""
-	EnableHotkeys()
-	Gui, EditGui: Destroy ; We cannot recreate the same gui. We must destroy or redisplay it.
-	;Reload
+	destoryEditGUI()
 	return
 
 MainGuiGuiClose:
+	;getMinClose()
 	ExitApp
 	return
 	
@@ -235,9 +198,10 @@ Workflow:
 	prevWFCheck := workflowCheck
 	workflowCheck := Workflow
 
-	destroy1GUI()
+	destroyMainGUI()
 	; redraw GUI
 	global height := guiHeightModifier()
+	global width := guiWidthModifier()
 	drawMainGUI()
 	/*
 	drawHeaderGUI()
@@ -257,27 +221,6 @@ CamCheck:
 
 	OptionChanged()
 	UpdateHotkeyControls()
-	return
-
-ModCheck: ; ModCheck Removed
-	global modCheck
-
-	Gui, Submit, NoHide
-
-	prevWFCheck := workflowCheck
-	modCheck := ModGroup
-	
-	Loop 3 {
-		GuiControl, MainGui: Disable, Button%A_Index%
-	}
-	DisableHotkeys()
-	ModifyOptions() ; Function removed
-	UpdateHotkeyControls()
-	SaveSettings()
-	EnableHotkeys()
-	Loop 3 {
-		GuiControl, MainGui: Enable, Button%A_Index%
-	}
 	return
 
 SpecialChoice:
