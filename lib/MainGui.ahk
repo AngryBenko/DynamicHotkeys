@@ -4,11 +4,17 @@
 drawMainGUI() {
     global
 
+    firstColumn := 5
+    secondColumn := guiColumnPos()
+    editWidth := 130
+    descWidth := editWidth + 10
+    workflowPos := secondColumn + 150
+
     general := "Welcome to "
     general .= title
     general .= "!`n"
+    general .= "Please select the appropriate workflow from the dropdow box on the right`n"
     general .= "Press the shortcuts below to apply types or to select tool.`n"
-    general .= "If you do not have extra mouse buttons, check 'Middle' box. Otherwise select your preferred thumb button`n"
     general .= "To edit/setup shortcuts, go to File -> Edit Keybinds."
     important := "Please do not close this window for the script to work in the background!"
 
@@ -17,35 +23,51 @@ drawMainGUI() {
     drawMainWorkflowGUI()
 
     Gui, MainGui: +Resize -MaximizeBox
-	Gui, MainGui: Show, Center w900 h%height% , %Title%
+	Gui, MainGui: Show, Center w%width% h%height% , %Title%
     return
 }
 
 drawHeaderGUI() {
 	global
 
+    ;Menu, FileMenu, Add, Minimize on Close, MinClose
 	Menu, FileMenu, Add, Edit Keybinds, 2ndGui
+    Menu, FileMenu, Add, Always on Top, ATop
 	Menu, FileMenu, Add, Reload Script, Reload
 	Menu, MyMenuBar, Add, &File, :FileMenu
 	Menu, MyMenuBar, Add, &Help, Help
     Gui, MainGui: Default
 	Gui, MainGui: Menu, MyMenuBar
 	Gui, MainGui: Font, s9 normal, Segoe UI
-	Gui, MainGui: Add, Text, cBlack y5, %general%
-	Gui, MainGui: Font, s9 bold, Segoe UI
-	Gui, MainGui: Add, Text, cBlack y5 xp+675, Workflow:
-	Gui, MainGui: Add, DropDownList, vWorkflow gWorkflow yp xp+65, Line|RE|LG|SVA/SE|Cuboids
-	Gui, MainGui: Font, s9 bold, Segoe UI
-	Gui, MainGui: Add, Text, cBlack x11 y65, %important%
-	Gui, MainGui: Font, s10 normal, Segoe UI
-	Gui, MainGui: Add, Text, cBlack yp+20 x90, Primary
-	Gui, MainGui: Add, Text, cBlack yp xp+125, Secondary
-	;Gui, MainGui: Add, Radio, vModGroup gModCheck Group yp xp+150 , Middle
-	;Gui, MainGui: Add, Radio, gModCheck yp xp+70 Checked , Thumb1
-	;Gui, MainGui: Add, Radio, gModCheck yp xp+80 , Thumb2
-	Gui, MainGui:+AlwaysOnTop
+	Gui, MainGui: Add, Text,, %general%
 
+	Gui, MainGui: Font, s9 bold, Segoe UI
+	Gui, MainGui: Add, Text, xp+%workflowPos% cBlack , Workflow:
+	Gui, MainGui: Add, DropDownList, vWorkflow gWorkflow ym, Line|RE|LG|SVA/SE|Cuboids
+    
+	Gui, MainGui: Font, s10 bold, Segoe UI
+	Gui, MainGui: Add, Text, cBlack xm , %important%
+	Gui, MainGui: Font, s10 normal, Segoe UI
 	return
+}
+
+
+updateFileMenu() {
+    if (atopcheck) {
+		Menu, FileMenu, Check, Always on Top
+		Gui, MainGui: +AlwaysOnTop
+	} else {
+		Menu, FileMenu, UnCheck, Always on Top
+		Gui, MainGui: -AlwaysOnTop
+	}
+    /*
+    if (minclosecheck) {
+        Menu, FileMenu, Check, Minimize on Close
+    } else {
+        Menu, FileMenu, UnCheck, Minimize on Close
+    }
+    */
+    return
 }
 
 drawMainWorkflowGUI() {
@@ -75,34 +97,33 @@ drawMainLIGUI() {
         
         Gui, MainGui: Font, s10, Segoe UI
 
-        if (A_Index == LINumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_Index <= LINumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (LI)
+        if (A_Index <= LINumHotkeys) {
+            Gui, MainGui: Add, Text, x%firstColumn%, (Lines)
         } else {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Misc)
+            if (!LINumHotkeys) {
+                Gui, MainGui: Add, Text, x%firstColumn%, (Misc)
+            } else {
+                Gui, MainGui: Add, Text, x%secondColumn% y%ypos%, (Misc)
+            }
         }
 
         Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vLIHotkeyName1%A_Index% w110 yp-1 xp+50 , None
-        Gui, MainGui: Font, s10, Segoe UI
-
-        if (A_Index == LINumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;
-        } else {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;
-        }
-
-        Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vLIHotkeyName2%A_Index% w80 yp-1 xp+28, None
+        Gui, MainGui: Add, Edit, Disabled vLIHotkeyName1%A_Index% w%editWidth% xp+65 , None
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index != LINumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+128, %displayType%
+            if (A_Index > LINumHotkeys) {
+                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
+            } else {
+                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
+            }
         } else {
-            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit yp xp+100, Custom|MSTeam Mute
+            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit xp+%descWidth%, Custom|MSTeam Mute
         }
-		ypos += 25
+
+        if (A_Index >= LINumHotkeys) {
+            ypos += 27
+        }
 	}
 	return
 }
@@ -118,35 +139,33 @@ drawMainREGUI() {
     
         Gui, MainGui: Font, s10, Segoe UI
 
-        if (A_Index == RENumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_Index <= RENumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (RE)
+        if (A_Index <= RENumHotkeys) {
+            Gui, MainGui: Add, Text, x%firstColumn%, (RE)
         } else {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Misc)
+            if (!RENumHotkeys) {
+                Gui, MainGui: Add, Text, x%firstColumn%, (Misc)
+            } else {
+                Gui, MainGui: Add, Text, x%secondColumn% y%ypos%, (Misc)
+            }
         }
 
         Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vREHotkeyName1%A_Index% w110 yp-1 xp+50 , None
-        Gui, MainGui: Font, s10, Segoe UI
-
-        if (A_Index == RENumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;;;;;;;;
-        } else {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;;;;;;;
-        }
-
-        Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vREHotkeyName2%A_Index% w80 yp-1 xp+28, None
+        Gui, MainGui: Add, Edit, Disabled vREHotkeyName1%A_Index% w%editWidth% xp+65, None ; xp is the base
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index != RENumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+128, %displayType%
+            if (A_Index > RENumHotkeys) {
+                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
+            } else {
+                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
+            }
         } else {
-            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit yp xp+100, Custom|MSTeam Mute
+            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit xp+%descWidth%, Custom|MSTeam Mute
         }
-        
-		ypos += 25
+
+        if (A_Index >= RENumHotkeys) {
+            ypos += 27
+        }
 	}
 	return
 }
@@ -163,35 +182,29 @@ drawMainLGGUI() {
 
         Gui, MainGui: Font, s10, Segoe UI
 
-        if (A_Index == LGNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_Index <= LGNumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (LG)
+        if (A_Index <= LGNumHotkeys) {
+            Gui, MainGui: Add, Text, x%firstColumn%, (LG)
         } else {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Misc)
+            if (!LGNumHotkeys) {
+                Gui, MainGui: Add, Text, x%firstColumn%, (Misc)
+            } else {
+                Gui, MainGui: Add, Text, x%secondColumn% y%ypos%, (Misc)
+            }
         }
 
         Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vLGHotkeyName1%A_Index% w110 yp-1 xp+50 , None
-        Gui, MainGui: Font, s10, Segoe UI
-
-        if (A_Index == LGNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;;
-        } else {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;;
-        }
-
-        Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vLGHotkeyName2%A_Index% w80 yp-1 xp+28, None
+        Gui, MainGui: Add, Edit, Disabled vLGHotkeyName1%A_Index% w%editWidth% xp+65, None ; xp is the base
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index != LGNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+128, %displayType%
+            Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
         } else {
-            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit yp xp+100, Custom|MSTeam Mute
+            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit xp+%descWidth%, Custom|MSTeam Mute
         }
-  
-		ypos += 25
+
+        if (A_Index >= LGNumHotkeys) {
+            ypos += 27
+        }
 	}
 	return
 }
@@ -207,99 +220,87 @@ drawMainSVASEGUI() {
 
         Gui, MainGui: Font, s10, Segoe UI
 
-        if (A_Index == SVASENumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_Index <= SVASENumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (SVASE)
+        if (A_Index <= SVASENumHotkeys) {
+            Gui, MainGui: Add, Text, x%firstColumn%, (SVASE)
         } else {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Misc)
+            if (!SVASENumHotkeys) {
+                Gui, MainGui: Add, Text, x%firstColumn%, (Misc)
+            } else {
+                Gui, MainGui: Add, Text, x%secondColumn% y%ypos%, (Misc)
+            }
         }
 
         Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vSVASEHotkeyName1%A_Index% w110 yp-1 xp+50 , None
-        Gui, MainGui: Font, s10, Segoe UI
-
-        if (A_Index == SVASENumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+87, =/+ ;;
-        } else {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+115, OR ;;
-        }
-
-        Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vSVASEHotkeyName2%A_Index% w80 yp-1 xp+28, None
+        Gui, MainGui: Add, Edit, Disabled vSVASEHotkeyName1%A_Index% w%editWidth% xp+65, None ; xp is the base
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index != SVASENumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos% xp+128, %displayType%
+            if (A_Index > SVASENumHotkeys) {
+                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
+            } else {
+                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
+            }
         } else {
-            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit yp xp+100, Custom|MSTeam Mute
+            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit xp+%descWidth%, Custom|MSTeam Mute
         }
 
-		ypos += 25
+        if (A_Index >= SVASENumHotkeys) {
+            ypos += 27
+        }
 	}
 	return
 }
 
 drawMainCuboidsGUI() {
     global
-    Loop % (CuboidsNumHotkeys + NumHotkeys) {
-        if (A_Index > CuboidsNumHotkeys) {
-			displayType := DisplayVar[A_Index - CuboidsNumHotkeys]
+    totalNumHotkey := CuboidsNumHotkeys + CuboidsNumHotkeysA
+    Loop % (totalNumHotkey + NumHotkeys) {
+        if (A_Index > totalNumHotkey) {
+			displayType := DisplayVar[A_Index - totalNumHotkey]
 		} else {
-			displayType := CuboidsDisplayVar[A_Index]
+            if (A_Index > CuboidsNumHotkeys) {
+                displayType := CuboidsDisplayVar2[A_Index - CuboidsNumHotkeys]
+            } else {
+                displayType := CuboidsDisplayVar[A_Index]
+            }
 		}
 
-        Gui, MainGui: Font, s10, Segoe UI
+        Gui, MainGui: Font, s10 Normal, Segoe UI
 
-        if (A_Index == CuboidsNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x450 y%ypos2%, (Special)
-        } else if (A_Index <= CuboidsNumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack x5 y%ypos%, (Cuboids)
+        if (A_Index <= CuboidsNumHotkeys) {
+            Gui, MainGui: Add, Text, x%firstColumn%, (Cuboids)
         } else {
-            Gui, MainGui: Add, Text, cBlack x450 y%ypos2%, (Misc)
-        }
-
-        Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName1%A_Index% w90 yp-1 xp+65 , None
-        Gui, MainGui: Font, s10, Segoe UI
-
-        if (A_Index == CuboidsNumHotkeys + NumHotkeys) {
-            Gui, MainGui: Add, Text, cBlack y%ypos2% xp+100, =/+ ;
-        } else {
-            if (A_Index > CuboidsNumHotkeys){
-                Gui, MainGui: Add, Text, cBlack y%ypos2% xp+100, OR ;
+            if (!CuboidsNumHotkeys) {
+                Gui, MainGui: Add, Text, x%firstColumn%, (Misc)
             } else {
-                Gui, MainGui: Add, Text, cBlack y%ypos% xp+100, OR ;
+                if (A_Index > totalNumHotkey) {
+                    Gui, MainGui: Add, Text, x%secondColumn% y%ypos%, (Misc)
+                } else {
+                    Gui, MainGui: Add, Text, x%secondColumn% y%ypos%, (Cuboids)
+                }
             }
         }
 
         Gui, MainGui: Font, s8, Segoe UI
-        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName2%A_Index% w90 yp-1 xp+28, None
+        Gui, MainGui: Add, Edit, Disabled vCuboidsHotkeyName1%A_Index% w%editWidth% xp+65, None ; xp is the base
         Gui, MainGui: Font, s10, Segoe UI
 
-        if (A_Index != CuboidsNumHotkeys + NumHotkeys) {
-            if (A_Index > CuboidsNumHotkeys) {
-                Gui, MainGui: Add, Text, cBlack y%ypos2% xp+95, %displayType%
-            } else {
-                Gui, MainGui: Add, Text, cBlack y%ypos% xp+95, %displayType%
-            }
+        if (A_Index != totalNumHotkey + NumHotkeys) {
+            Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
         } else {
-            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit yp xp+100, Custom|MSTeam Mute
+            Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit xp+%descWidth%, Custom|MSTeam Mute
         }
 
         if (A_Index >= CuboidsNumHotkeys) {
-            ypos2 += 25
-        } else {
-            ypos += 25
+            ypos += 27
         }
     }
     return
 }
 
-destroy1GUI() {
+destroyMainGUI() {
 	global
-	ypos := 105
-    ypos2 := 80
+	ypos := 67
     general := ""
 	Gui, MainGui: Destroy
 	return

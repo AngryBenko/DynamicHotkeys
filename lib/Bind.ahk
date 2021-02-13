@@ -1,7 +1,7 @@
 detectClash(type, tmp) { ; only compare if HK is not empty
 	if (type == 1) {
 		Loop % (LINumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(LIHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(LIHotkeyList[A_Index].hks) == StripPrefix(tmp)){
+			if (StripPrefix(LIHotkeyList[A_Index].hkp) == StripPrefix(tmp)){
 				prehkp := LIHotkeyList[A_Index].hkp
 				prehks := LIHotkeyList[A_Index].hks
 				pretmp := tmp
@@ -11,7 +11,7 @@ detectClash(type, tmp) { ; only compare if HK is not empty
 		}
 	} else if (type == 2) {
 		Loop % (RENumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(REHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(REHotkeyList[A_Index].hks) == StripPrefix(tmp)){
+			if (StripPrefix(REHotkeyList[A_Index].hkp) == StripPrefix(tmp)){
 				prehkp := REHotkeyList[A_Index].hkp
 				prehks := REHotkeyList[A_Index].hks
 				pretmp := tmp
@@ -21,7 +21,7 @@ detectClash(type, tmp) { ; only compare if HK is not empty
 		}
 	} else if (type == 3) {
 		Loop % (LGNumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(LGHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(LGHotkeyList[A_Index].hks) == StripPrefix(tmp)){
+			if (StripPrefix(LGHotkeyList[A_Index].hkp) == StripPrefix(tmp)){
 				prehkp := LGHotkeyList[A_Index].hkp
 				prehks := LGHotkeyList[A_Index].hks
 				pretmp := tmp
@@ -31,7 +31,7 @@ detectClash(type, tmp) { ; only compare if HK is not empty
 		}
 	} else if (type == 4) {
 		Loop % (SVASENumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(SVASEHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(SVASEHotkeyList[A_Index].hks) == StripPrefix(tmp)){
+			if (StripPrefix(SVASEHotkeyList[A_Index].hkp) == StripPrefix(tmp)){
 				prehkp := SVASEHotkeyList[A_Index].hkp
 				prehks := SVASEHotkeyList[A_Index].hks
 				pretmp := tmp
@@ -40,8 +40,8 @@ detectClash(type, tmp) { ; only compare if HK is not empty
 			}
 		}
 	} else if (type == 5) {
-		Loop % (CuboidsNumHotkeys + NumHotkeys){ ; check if there are any clashes between global hotkeys
-			if (StripPrefix(CuboidsHotkeyList[A_Index].hkp) == StripPrefix(tmp) || StripPrefix(CuboidsHotkeyList[A_Index].hks) == StripPrefix(tmp)){
+		Loop % (CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys){ ; check if there are any clashes between global hotkeys
+			if (StripPrefix(CuboidsHotkeyList[A_Index].hkp) == StripPrefix(tmp)){
 				prehkp := CuboidsHotkeyList[A_Index].hkp
 				prehks := CuboidsHotkeyList[A_Index].hks
 				pretmp := tmp
@@ -59,35 +59,35 @@ applyKeybind(type, select, outhk, HKControlType, ctrlnum) {
 	if (type == 1) {
 		if (select == 1) { ; select primary or secondary
 			;FileAppend DID I GET HERE? ,*
-			tmp := {hkp: outhk, typep: HKControlType, hks: LIHotkeyList[ctrlnum].hks, types: LIHotkeyList[ctrlnum].types, status: 0}
+			tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		} else {
 			tmp := {hkp: LIHotkeyList[ctrlnum].hkp, typep: LIHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
 		}
 		LIHotkeyList[ctrlnum] := tmp
 	} else if (type == 2) {
 		if (select == 1) { ; select primary or secondary
-			tmp := {hkp: outhk, typep: HKControlType, hks: REHotkeyList[ctrlnum].hks, types: REHotkeyList[ctrlnum].types, status: 0}
+			tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		} else {
 			tmp := {hkp: REHotkeyList[ctrlnum].hkp, typep: REHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
 		}
 		REHotkeyList[ctrlnum] := tmp
 	} else if (type == 3) {
 		if (select == 1) { ; select primary or secondary
-			tmp := {hkp: outhk, typep: HKControlType, hks: LGHotkeyList[ctrlnum].hks, types: LGHotkeyList[ctrlnum].types, status: 0}
+			tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		} else {
 			tmp := {hkp: LGHotkeyList[ctrlnum].hkp, typep: LGHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
 		}
 		LGHotkeyList[ctrlnum] := tmp
 	} else if (type == 4) {
 		if (select == 1) { ; select primary or secondary
-			tmp := {hkp: outhk, typep: HKControlType, hks: SVASEHotkeyList[ctrlnum].hks, types: SVASEHotkeyList[ctrlnum].types, status: 0}
+			tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		} else {
 			tmp := {hkp: SVASEHotkeyList[ctrlnum].hkp, typep: SVASEHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
 		}
 		SVASEHotkeyList[ctrlnum] := tmp
 	} else if (type == 5) {
 		if (select == 1) { ; select primary or secondary
-			tmp := {hkp: outhk, typep: HKControlType, hks: CuboidsHotkeyList[ctrlnum].hks, types: CuboidsHotkeyList[ctrlnum].types, status: 0}
+			tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		} else {
 			tmp := {hkp: CuboidsHotkeyList[ctrlnum].hkp, typep: CuboidsHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
 		}
@@ -119,9 +119,9 @@ Bind(ctrlnum, select){
 	BindMode := 1
 
 	; Show the prompt
-	prompt .= "Please press the desired key.`n"
-	prompt .= "(LG) keybinds are automatically paired with ThumbButton 1. If 'Laptop Only' is checked, automatically paired Middle Mouse`n"
-	prompt .= "(Special) is reserved custom keybinds. Ex: ThumbButton 2 = Enter`n"
+	prompt .= "You must hold down a desired modifier button: ThumbButton1, ThumbButton2, or Middle Mouse Button.`n"
+	prompt .= "While holding one of the designated modifier buttons above, next press your desired key.`n"
+	prompt .= "(Special) is reserved custom keybinds. Ignore unless you know what you are doing.`n"
 	prompt .= "Supports most keyboard keys.`n"
 	prompt .= "`nHit Escape to cancel."
 	Gui, EditGui: +LastFound

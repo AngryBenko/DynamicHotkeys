@@ -6,31 +6,31 @@ searchHotkey(verType){
 	
 	if (verType == 1) {
 		Loop % (LINumHotkeys + NumHotkeys) {
-			if (LIHotkeyList[A_Index].hkp == StripPrefix(temp) || LIHotkeyList[A_Index].hks == StripPrefix(temp)) {
+			if (LIHotkeyList[A_Index].hkp == StripPrefix(temp)) {
 				return %A_Index%
 			}
 		}
 	} else if (verType == 2) {
 		Loop % (RENumHotkeys + NumHotkeys) {
-			if (REHotkeyList[A_Index].hkp == StripPrefix(temp) || REHotkeyList[A_Index].hks == StripPrefix(temp)) {
+			if (REHotkeyList[A_Index].hkp == StripPrefix(temp)) {
 				return %A_Index%
 			}
 		}
 	} else if (verType == 3) {
 		Loop % (LGNumHotkeys + NumHotkeys) {
-			if (LGHotkeyList[A_Index].hkp == StripPrefix(temp) || LGHotkeyList[A_Index].hks == StripPrefix(temp)) {
+			if (LGHotkeyList[A_Index].hkp == StripPrefix(temp)) {
 				return %A_Index%
 			}
 		}
 	} else if (verType == 4) {
 		Loop % (SVASENumHotkeys + NumHotkeys) {
-			if (SVASEHotkeyList[A_Index].hkp == StripPrefix(temp) || SVASEHotkeyList[A_Index].hks == StripPrefix(temp)) {
+			if (SVASEHotkeyList[A_Index].hkp == StripPrefix(temp)) {
 				return %A_Index%
 			}
 		}
 	} else if (verType == 5) {
-		Loop % (CuboidsNumHotkeys + NumHotkeys) {
-			if (CuboidsHotkeyList[A_Index].hkp == StripPrefix(temp) || CuboidsHotkeyList[A_Index].hks == StripPrefix(temp)) {
+		Loop % (CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys) {
+			if (CuboidsHotkeyList[A_Index].hkp == StripPrefix(temp)) {
 				return %A_Index%
 			}
 		}
@@ -73,11 +73,15 @@ shortcutAutoDist(verType) {
 			shortcut(labelNum, verType)
 		}
 	} else if (verType == 5) {
-		if (labelNum > CuboidsNumHotkeys) { ; Cuboids uses letters
-			globalShortcut(labelNum - CuboidsNumHotkeys)
+		if (labelNum > CuboidsNumHotkeys + CuboidsNumHotkeysA) { ; Cuboids uses letters
+			globalShortcut(labelNum - (CuboidsNumHotkeys + CuboidsNumHotkeysA))
 		} else {
 			;cuboidShortcut(labelnum)
-			shortcut(labelNum, verType)
+			if (labelNum < CuboidsNumHotkeys) {
+				shortcut(labelNum, verType)
+			} else {
+				cuboidsShortcut(labelNum - CuboidsNumHotkeys)
+			}
 		}
 	}
 	; LG, shortct()
@@ -127,6 +131,17 @@ LIShortcut(x) {
 	return
 }
 
+cuboidsShortcut(x) {
+	if (x == 1) {
+		imageLidar()
+	} else if (x == 2) {
+		stackLidar()
+	} else if (x == 3) {
+		isoBoid()
+	}
+	return
+}
+
 globalShortcut(x) {
 	if (x == 1) {
 		spline()
@@ -141,51 +156,21 @@ globalShortcut(x) {
 	} else if (x == 6) {
 		googleTiles()
 	} else if (x == 7) {
-		winSnapshot()
+		curMode()
 	} else if (x == 8) {
-		camForward()
+		winSnapshot()
 	} else if (x == 9) {
-		camBackward()
+		camForward()
 	} else if (x == 10) {
+		camBackward()
+	} else if (x == 11) {
 		special()
 	}
 	return
 }
 
-cuboidShortcut(x) {
-	if (verType == 5) {
-		y := x
-		if (x == 10) {
-			y := 0
-		} else if (x == 11) {
-			y := "a"
-		} else if (x == 12) {
-			y := "b"
-		} else if (x == 13) {
-			y := "c"
-		} else if (x == 14) {
-			y := "d"
-		} else if (x == 15) {
-			y := "e"
-		} else if (x == 16) {
-			y := "f"
-		} else if (x == 17) {
-			y := "g"
-		} else if (x == 18) { ; Cuboids 'J' results in Unknown
-			y := "h"
-		} else if (x == 19) {
-			y := "i"
-		} else if (x == 20) {
-			y := "l"
-		}
-	}
-	;SendInput, .1%y%
-	msgbox Pressed
-	return
-}
-
 shortcut(x, verType) { ; Check if x is number
-	if (verType == 5) {
+	if (verType == 5) { ; Cuboids
 		y := x
 		if (x == 10) {
 			y := 0
@@ -200,22 +185,19 @@ shortcut(x, verType) { ; Check if x is number
 		} else if (x == 15) {
 			y := "e"
 		} else if (x == 16) {
-			y := "f"
-		} else if (x == 17) {
 			y := "g"
-		} else if (x == 18) { ; Cuboids 'J' results in Unknown
+		} else if (x == 17) {
 			y := "h"
-		} else if (x == 19) {
+		} else if (x == 18) { ; Cuboids 'J' results in Unknown
 			y := "i"
-		} else if (x == 20) {
+		} else if (x == 19) {
 			y := "l"
 		}
 	} else {
 		y := x + 1
 	}
-	;SendInput, .1%y%
-	msgbox Pressed
-	;msgbox Pressed shortcut %x%
+	SendInput, .1%y%
+	;msgbox Pressed
 	return
 }
 
@@ -262,6 +244,10 @@ revReg() {
 	return
 }
 
+curMode() {
+	SendInput, {Alt Down}{Shift down}{s}{Alt up}{Shift up}
+	return
+}
 
 satTube() {
 	SendInput, {Alt down}{Shift down}{t}{Alt up}{Shift up}
@@ -278,20 +264,21 @@ winSnapshot() {
 	return
 }
 
+
 camForward() {
-	if (GetKeyState("Shift", "P")) {
-		SendInput, {Shift down}{Right}{Shift up}
-	} else {
-		SendInput, {Right}
-	}
+	BlockInput,  On
+	SendInput, {Right}
+	Sleep, 35
+	BlockInput, Off
+	return
 }
 
 camBackward() {
-	if (GetKeyState("Shift", "P")) {
-		SendInput, {Shift down}{Left}{Shift up}
-	} else {
-		SendInput, {Left}
-	}
+	BlockInput,  On
+	SendInput, {Left}
+	Sleep, 35
+	BlockInput, Off
+	return
 }
 
 teamsmute() {
@@ -302,5 +289,20 @@ teamsmute() {
 	SendInput, ^+m
 	
 	;msgbox Hello
+	return
+}
+
+imageLidar() {
+	SendInput, {Ctrl Down}{Shift down}{l}{Ctrl up}{Shift up}
+	return
+}
+
+stackLidar() {
+	SendInput, {Alt Down}{l}{Alt up}
+	return
+}
+
+isoBoid() {
+	SendInput, {Alt Down}{u}{Alt up}
 	return
 }

@@ -2,32 +2,55 @@ guiHeightModifier() {
 	mult := 25
 	fixedHeight := 150
 	if (workflowCheck == "Line") {
-		return ((NumHotkeys + LINumHotkeys) * mult) + fixedHeight
+		return (LINumHotkeys > NumHotkeys ? (LINumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
 	} else if (workflowCheck == "RE") {
-		return ((NumHotkeys + RENumHotkeys) * mult) + fixedHeight
+		return (RENumHotkeys > NumHotkeys ? (RENumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
 	} else if (workflowCheck == "LG") {
-		return ((NumHotkeys + LGNumHotkeys) * mult) + fixedHeight
+		return (LGNumHotkeys > NumHotkeys ? (LGNumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
 	} else if (workflowCheck == "SVA/SE") {
-		return ((NumHotkeys + SVASENumHotkeys) * mult) + fixedHeight
+		return (SVASENumHotkeys > NumHotkeys ? (SVASENumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
 	} else if (workflowCheck == "Cuboids") {
-		return ((CuboidsNumHotkeys) * mult) + fixedHeight
+		return (CuboidsNumHotkeys > NumHotkeys ? (CuboidsNumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
 	}
 }
 
 guiWidthModifier() {
-	mult := 25
-	fixedWidth := 0
+	fixedWidth := 375
 	if (workflowCheck == "Line") {
-		return ((NumHotkeys + LINumHotkeys) * mult)
+		return guiColumnPos() + fixedWidth
 	} else if (workflowCheck == "RE") {
-		return ((NumHotkeys + RENumHotkeys) * mult)
+		return guiColumnPos() + fixedWidth
 	} else if (workflowCheck == "LG") {
-		return ((NumHotkeys + LGNumHotkeys) * mult)
+		return guiColumnPos() + fixedWidth
 	} else if (workflowCheck == "SVA/SE") {
-		return ((NumHotkeys + SVASENumHotkeys) * mult)
+		return guiColumnPos() + fixedWidth
 	} else if (workflowCheck == "Cuboids") {
-		return ((NumHotkeys + CuboidsNumHotkeys) * mult) 
+		return guiColumnPos() + fixedWidth 
 	}
+}
+
+guiColumnPos() {
+	if (workflowCheck == "Line") {
+		return 450
+	} else if (workflowCheck == "RE") {
+		return 375
+	} else if (workflowCheck == "LG") {
+		return 350
+	} else if (workflowCheck == "SVA/SE") {
+		return 325
+	} else if (workflowCheck == "Cuboids") {
+		return 325
+	}
+}
+
+getMinClose() {
+	global
+	if (minclosecheck) {
+		Gui, Cancel
+	} else {
+		ExitApp
+	}
+	return
 }
 
 OptionChanged(){
@@ -178,8 +201,8 @@ BuildHotKeyName(hk, ctrltype){
 	if (hk != "") {
 		outstr := hk
 		if (ctrltype == 5) { ; Fixed hotkey
-			tmp2 := substr(hk, 7)
-			outstr := "Alt + "
+			tmp2 := substr(hk, 9)
+			outstr := "Space + "
 			outstr .= tmp2
 		} else if (ctrltype == 4) { ; RESERVERD FOR SPECIAL
 			if (hk == "XBUTTON1") {
