@@ -8,6 +8,10 @@
 /*
 TODO:
 - Add support for mmo mouse
+- New added hotkeys
+	- Pitch | Alt + Q/E
+	- Cycle Keyframes | Ctrl + Arrow
+	- Boundary Grid | Ctrl + Shift + G
 */
 
 #Include, %A_ScriptDir%\lib\hotkeyAction.ahk
@@ -64,6 +68,7 @@ global EXTRA_KEY_LIST .= "{Ins}"
 ;EXTRA_KEY_LIST .= "{Launch_Mail}{Launch_Media}{Launch_App1}{Launch_App2}"
 
 ; BindMode vars
+global versionNum := 1.1
 global HKControlType := 0
 global HKModifierState := {}
 global HKLastHotkey := 0 ; Time that Escape was pressed to exit key binding. Used to determine if Escape is held (Clear binding)
@@ -71,20 +76,18 @@ global DefaultHKObject := {hkp: "", typep: ""}
 
 ; Misc vars
 global firstRun := 0
-global Title := "FLIDE 3D Helper v2.0"
+global Title := "FLIDE 3D AllinOne"
 global VersionVar := ["HotkeyList", "LIHotkeyList", "REHotkeyList", "LGHotkeyList", "SVASEHotkeyList"]
-global DisplayVar := ["Spline", "Connection Tool", "Reverse Direction", "Reverse Region", "Satellite Tube", "Google Tiles", "Cursor Mode", "Windows Snapshot", "Camera Forward", "Camera Backward"]
+global DisplayVar := ["Spline", "Connection Tool", "Reverse Direction", "Reverse Region", "Satellite Tube", "Google Tiles", "Cursor Mode", "Windows Snapshot", "First IF", "Last IF", "Camera Forward", "Camera Backward"]
 global LIDisplayVar := ["Double Solid Yellow Median", "Solid Yellow Median", "Dashed White", "Solid White Shoulder", "Solid White Line Crosswalk", "Solid White Line Crosswalk/Intersection", "Crosswalk Crosswalk-Region", "Crosswalk Crosswalk/Intersection", "Double Solid Yellow Bidirectional", "Inferred Parking", "Dashed Solid Yellow Suicide", "Solid White Bike Region", "Solid White Bike/Shoulder", "Short Dashed Normal", "Short Dashed Bike", "Short Dashed Shoulder", "Solid White Intersection"]
 global LIDisplayVarAdd := ["Solid White Parking", "Inferred Shoulder/Parking", "Inferred Cross/'Unknown", "Inferred CW/Parking", "Reversible Parking Line", "Dashed Bidirectional Yellow Line", "Solid Bidirectional White Line", "Solid Bidirecttional Yellow Line"]
 global REDisplayVar := ["Road Boundary", "Median Flow-Separating", "Median Flow-Same", "Intersection Island", "Roundabout", "Under_Roof"]
 global LGDisplayVar := ["Type Lane", "Type Left_Bounded", "Type Right_Bounded", "Type Connection", "Type Bidirectional", "Type Roundabout", "Type Guide"]
 /*
-.12 - .1l
 
-.11, .1j = Unknown
 */
 global CuboidsDisplayVar := ["Unknown", "Car", "MiniVan", "SUV", "Van", "Small_Truck", "Large_Truck", "Pickup", "Bus", "Animal", "Trailer", "Scooter", "Skateboard", "Wheelchair", "Other", "Bicycle", "Motorbike", "Pedestrian", "Train"]
-global CuboidsDisplayVar2 := ["Image Lidar", "Stacked Lidar", "Isolate Cuboid"]
+global CuboidsDisplayVar2 := ["Image Lidar", "Stacked Lidar", "Isolate Cuboid", "Depth Dense", "Image Radar", "Cycle Keyframes", "Pitch", "Boundary Grid"]
 global ININame := BuildIniName()
 global LIHotkeyList := []
 global REHotkeyList := []
@@ -99,14 +102,14 @@ global prevWFCheck := "Line"
 global camDisable1 := 0
 global camDisable2 := 0
 
-global NumHotkeys := 11
+global NumHotkeys := 13 ; 13
 global LINumHotkeys := 17
 global LINumHotkeysAdd := 8
 global RENumHotkeys := 6
 global LGNumHotkeys := 7
 global SVASENumHotkeys := 0
 global CuboidsNumHotkeys := 19
-global CuboidsNumHotkeysA := 3
+global CuboidsNumHotkeysA := 5
 
 
 global ypos := 67
@@ -184,9 +187,15 @@ EditGuiGuiClose:
 	destoryEditGUI()
 	return
 
+	/*
 MainGuiGuiClose:
 	;getMinClose()
 	ExitApp
+	return
+	*/
+	
+DisplayWindow:
+	Gui, MainGui: Show
 	return
 	
 Workflow:
@@ -296,7 +305,7 @@ EscapeReleased:
 ; Enables User-Defined Hotkeys
 
 
-#If BindMode ; This is will allow xbutton1 and enter to be solo keybinds
+#If BindMode ; This is will allow mouse buttons and enter to be solo keybinds
 	; Detect down of modifier keys
 	*xbutton2::
 	*xbutton1::

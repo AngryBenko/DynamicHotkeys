@@ -24,6 +24,8 @@ drawMainGUI() {
 
     Gui, MainGui: +Resize -MaximizeBox
 	Gui, MainGui: Show, Center w%width% h%height% , %Title%
+	Menu, Tray, Add, Show Window, DisplayWindow
+	;Menu, Tray, Icon, 3dlego.ico
     return
 }
 
@@ -112,11 +114,7 @@ drawMainLIGUI() {
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index != LINumHotkeys + NumHotkeys) {
-            if (A_Index > LINumHotkeys) {
-                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
-            } else {
-                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
-            }
+            Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
         } else {
             Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit xp+%descWidth%, Custom|MSTeam Mute
         }
@@ -154,11 +152,7 @@ drawMainREGUI() {
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index != RENumHotkeys + NumHotkeys) {
-            if (A_Index > RENumHotkeys) {
-                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
-            } else {
-                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
-            }
+            Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
         } else {
             Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit xp+%descWidth%, Custom|MSTeam Mute
         }
@@ -235,11 +229,7 @@ drawMainSVASEGUI() {
         Gui, MainGui: Font, s10, Segoe UI
 
         if (A_Index != SVASENumHotkeys + NumHotkeys) {
-            if (A_Index > SVASENumHotkeys) {
-                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
-            } else {
-                Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
-            }
+            Gui, MainGui: Add, Text, cBlack xp+%descWidth%, %displayType%
         } else {
             Gui, MainGui: Add, DropDownList, vSpecialChoice gSpecialChoice AltSubmit xp+%descWidth%, Custom|MSTeam Mute
         }

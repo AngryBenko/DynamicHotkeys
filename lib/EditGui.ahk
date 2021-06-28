@@ -1,5 +1,14 @@
 drawEditGUI() {
     global
+	
+	firstColumn := 5
+    secondColumn := guiColumnPos() + 150
+	if(workflowCheck == "SVA/SE") {
+		editGuiWidth := width
+	} else {
+		editGuiWidth := width + 250
+	}
+	
     Gui, MainGui: +LastFound
 	WinGetPos, xx, yy
 	xx += 10
@@ -10,20 +19,14 @@ drawEditGUI() {
 	Gui, EditGui: Font, s9 bold, Segoe UI
 	Gui, EditGui: Add, Text, cBlack y5, %editText%
 	Gui, EditGui: Font, s10 normal, Segoe UI
-	Gui, EditGui: Add, Text, cBlack yp+45 x185, Primary
-    Gui, EditGui: +AlwaysOnTop -MinimizeBox +Resize
-	ypos := 70
+	Gui, EditGui: Add, Text, cBlack yp+45 x185, 
+    Gui, EditGui: -MinimizeBox +Resize
+	ypos := 45
 
     drawEditWorkflowGUI()
 
     Gui, EditGui: Add, Button, gCloseEdit vCloseEdit xp+25 yp+35, Save
-	;height := height + 60
-    if (workflowCheck == "Cuboids") {
-        height := ((NumHotkeys + CuboidsNumHotkeys + CuboidsNumHotkeysA) * 25) + 150
-        Gui, EditGui: Show, Center w700 h%height% x%xx% y%yy%, Edit Keybinds
-    } else {
-        Gui, EditGui: Show, Center w700 h%height% x%xx% y%yy%, Edit Keybinds
-    }
+    Gui, EditGui: Show, Center w%editGuiWidth% h%height% x%xx% y%yy%, Edit Keybinds
 
 	LoadSettings()
     return
@@ -45,147 +48,220 @@ drawEditWorkflowGUI() {
 
 drawEditLIGUI() {
     global
-    Loop % (LINumHotkeys + NumHotkeys) {
-        if (A_Index > LINumHotkeys + LINumHotkeysAdd) { ; add additional lg shortcuts
-			displayType := DisplayVar[A_Index - (LINumHotkeys + LINumHotkeysAdd)]
-		} else if (A_Index <= LINumHotkeys) {
-			displayType := LIDisplayVar[A_Index]
+    totalNumHotkey := LINumHotkeys
+    Loop % (totalNumHotkey + NumHotkeys){
+        if (A_Index > totalNumHotkey) {
+			displayType := DisplayVar[A_Index - totalNumHotkey]
 		} else {
-            displayType := LIDisplayVarAdd[A_Index - LINumHotkeys]
-        }
+            displayType := LIDisplayVar[A_Index]
+		}
 
         Gui, EditGui: Font, s10, Segoe UI
-
-        if (A_Index == LINumHotkeys + LINumHotkeysAdd + NumHotkeys) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_index <= LINumHotkeys + LINumHotkeysAdd) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (LI) %displayType%
+		
+		if (A_Index <= LINumHotkeys) {
+            Gui, EditGui: Add, Text, x%firstColumn%, (Lines) %displayType%
         } else {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Misc) %displayType%
+            if (!LINumHotkeys) {
+                Gui, EditGui: Add, Text, x%firstColumn%, (Misc) %displayType%
+            } else {
+                if (A_Index > totalNumHotkey) {
+					if (A_Index = (totalNumHotkey + NumHotkeys)) {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Special)
+					} else {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Misc) %displayType%
+					}
+                } else {
+                    Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Lines) %displayType%
+                }
+            }
         }
-        
+
         Gui, EditGui: Font, s8, Segoe UI
-        Gui, EditGui: Add, Edit, Disabled vLIHotkeyName1%A_Index% w130 xp+155 y%ypos%, None
+		if (A_Index > LINumHotkeys) {
+			Gui, EditGui: Add, Edit, Disabled vLIHotkeyName1%A_Index% w%editWidth% xp+155, None
+		} else {
+			Gui, EditGui: Add, Edit, Disabled vLIHotkeyName1%A_Index% w%editWidth% xp+275, None
+		}
         Gui, EditGui: Font,, 
 
-        if (A_Index < (LINumHotkeys + LINumHotkeysAdd + NumHotkeys) && A_Index > ((LINumHotkeys + LINumHotkeysAdd + NumHotkeys) - 3)) {
+		
+        if (A_Index < (totalNumHotkey + NumHotkeys) && A_Index > ((totalNumHotkey + NumHotkeys) - 3)) {
             Gui, EditGui: Font, s10 bold, Segoe UI
             Gui, EditGui: Add, text, cBlack xp+140, Not customizable
             Gui, EditGui: Font,,
         } else {
-            Gui, EditGui: Add, Button, gBind1 v1Bind1%A_Index% yp-1 xp+140, Set Primary 
-            Gui, EditGui: Add, Button, gReset v1Reset%A_Index% xp+85, Reset Key
+            Gui, EditGui: Add, Button, gBind1 v1Bind1%A_Index% xp+140, Set Primary  
+            Gui, EditGui: Add, Button, gReset v1Reset%A_Index% xp+70, Reset Key
         }
-        ypos += 25
+		
+		if (A_Index >= LINumHotkeys) {
+            ypos += 27
+        }
     }
     return
 }
 
 drawEditREGUI() {
     global
-    Loop % (RENumHotkeys + NumHotkeys){
-        if (A_Index > RENumHotkeys) {
-			displayType := DisplayVar[A_Index - RENumHotkeys]
+    totalNumHotkey := RENumHotkeys
+    Loop % (totalNumHotkey + NumHotkeys){
+        if (A_Index > totalNumHotkey) {
+			displayType := DisplayVar[A_Index - totalNumHotkey]
 		} else {
-			displayType := REDisplayVar[A_Index]
+            displayType := REDisplayVar[A_Index]
 		}
 
         Gui, EditGui: Font, s10, Segoe UI
-
-        if (A_Index == RENumHotkeys + NumHotkeys) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_index <= RENumHotkeys) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (RE) %displayType%
+		
+		if (A_Index <= RENumHotkeys) {
+            Gui, EditGui: Add, Text, x%firstColumn%, (RE) %displayType%
         } else {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Misc) %displayType%
+            if (!RENumHotkeys) {
+                Gui, EditGui: Add, Text, x%firstColumn%, (Misc) %displayType%
+            } else {
+                if (A_Index > totalNumHotkey) {
+					if (A_Index = (totalNumHotkey + NumHotkeys)) {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Special)
+					} else {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Misc) %displayType%
+					}
+                } else {
+                    Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (RE) %displayType%
+                }
+            }
         }
 
         Gui, EditGui: Font, s8, Segoe UI
-        Gui, EditGui: Add, Edit, Disabled vREHotkeyName1%A_Index% w130 xp+155 y%ypos%, None
+		if (A_Index > RENumHotkeys) {
+			Gui, EditGui: Add, Edit, Disabled vREHotkeyName1%A_Index% w%editWidth% xp+155, None
+		} else {
+			Gui, EditGui: Add, Edit, Disabled vREHotkeyName1%A_Index% w%editWidth% xp+175, None
+		}
         Gui, EditGui: Font,, 
 
-        if (A_Index < (RENumHotkeys + NumHotkeys) && A_Index > ((RENumHotkeys + NumHotkeys) - 3)) {
+		
+        if (A_Index < (totalNumHotkey + NumHotkeys) && A_Index > ((totalNumHotkey + NumHotkeys) - 3)) {
             Gui, EditGui: Font, s10 bold, Segoe UI
             Gui, EditGui: Add, text, cBlack xp+140, Not customizable
             Gui, EditGui: Font,,
         } else {
-            Gui, EditGui: Add, Button, gBind1 v2Bind1%A_Index% yp-1 xp+140, Set Primary 
-            Gui, EditGui: Add, Button, gReset v2Reset%A_Index% xp+85, Reset Key
+            Gui, EditGui: Add, Button, gBind1 v2Bind1%A_Index% xp+140, Set Primary  
+            Gui, EditGui: Add, Button, gReset v2Reset%A_Index% xp+70, Reset Key
         }
-        ypos += 25
+		
+		if (A_Index >= RENumHotkeys) {
+            ypos += 27
+        }
     }
-
     return
 }
 
 drawEditLGGUI() {
     global
-    Loop % (LGNumHotkeys + NumHotkeys){
-        if (A_Index > LGNumHotkeys) {
-			displayType := DisplayVar[A_Index - LGNumHotkeys]
+    totalNumHotkey := LGNumHotkeys
+    Loop % (totalNumHotkey + NumHotkeys){
+        if (A_Index > totalNumHotkey) {
+			displayType := DisplayVar[A_Index - totalNumHotkey]
 		} else {
-			displayType := LGDisplayVar[A_Index]
+            displayType := LGDisplayVar[A_Index]
 		}
 
         Gui, EditGui: Font, s10, Segoe UI
-
-        if (A_Index == LGNumHotkeys + NumHotkeys) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_index <= LGNumHotkeys) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (LG) %displayType%
+		
+		if (A_Index <= LGNumHotkeys) {
+            Gui, EditGui: Add, Text, x%firstColumn%, (LG) %displayType%
         } else {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Misc) %displayType%
+            if (!LGNumHotkeys) {
+                Gui, EditGui: Add, Text, x%firstColumn%, (Misc) %displayType%
+            } else {
+                if (A_Index > totalNumHotkey) {
+					if (A_Index = (totalNumHotkey + NumHotkeys)) {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Special)
+					} else {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Misc) %displayType%
+					}
+                } else {
+                    Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (LG) %displayType%
+                }
+            }
         }
 
         Gui, EditGui: Font, s8, Segoe UI
-        Gui, EditGui: Add, Edit, Disabled vLGHotkeyName1%A_Index% w130 xp+155 y%ypos%, None
+		if (A_Index > LGNumHotkeys) {
+			Gui, EditGui: Add, Edit, Disabled vLGHotkeyName1%A_Index% w%editWidth% xp+155, None
+		} else {
+			Gui, EditGui: Add, Edit, Disabled vLGHotkeyName1%A_Index% w%editWidth% xp+155, None
+		}
         Gui, EditGui: Font,, 
 
-        if (A_Index < (LGNumHotkeys + NumHotkeys) && A_Index > ((LGNumHotkeys + NumHotkeys) - 3)) {
+		
+        if (A_Index < (totalNumHotkey + NumHotkeys) && A_Index > ((totalNumHotkey + NumHotkeys) - 3)) {
             Gui, EditGui: Font, s10 bold, Segoe UI
             Gui, EditGui: Add, text, cBlack xp+140, Not customizable
             Gui, EditGui: Font,,
         } else {
-            Gui, EditGui: Add, Button, gBind1 v3Bind1%A_Index% yp-1 xp+140, Set Primary 
-            Gui, EditGui: Add, Button, gReset v3Reset%A_Index% xp+85, Reset Key
+            Gui, EditGui: Add, Button, gBind1 v3Bind1%A_Index% xp+140, Set Primary  
+            Gui, EditGui: Add, Button, gReset v3Reset%A_Index% xp+70, Reset Key
         }
-        ypos += 25
+		
+		if (A_Index >= LGNumHotkeys) {
+            ypos += 27
+        }
     }
     return
 }
 
 drawEditSVASEGUI() {
     global
-    Loop % (SVASENumHotkeys + NumHotkeys){
-        if (A_Index > SVASENumHotkeys) {
-			displayType := DisplayVar[A_Index - SVASENumHotkeys]
+    totalNumHotkey := SVASENumHotkeys
+    Loop % (totalNumHotkey + NumHotkeys){
+        if (A_Index > totalNumHotkey) {
+			displayType := DisplayVar[A_Index - totalNumHotkey]
 		} else {
-			displayType := SVASEDisplayVar[A_Index]
+            displayType := SVASEDisplayVar[A_Index]
 		}
 
         Gui, EditGui: Font, s10, Segoe UI
-
-        if (A_Index == SVASENumHotkeys + NumHotkeys) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_index <= SVASENumHotkeys) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (SVASE) %displayType%
+		
+		if (A_Index <= SVASENumHotkeys) {
+            Gui, EditGui: Add, Text, x%firstColumn%, (SVASE) %displayType%
         } else {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Misc) %displayType%
+            if (!SVASENumHotkeys) {
+                Gui, EditGui: Add, Text, x%firstColumn%, (Misc) %displayType%
+            } else {
+                if (A_Index > totalNumHotkey) {
+					if (A_Index = (totalNumHotkey + NumHotkeys)) {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Special)
+					} else {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Misc) %displayType%
+					}
+                } else {
+                    Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (SVASE) %displayType%
+                }
+            }
         }
 
         Gui, EditGui: Font, s8, Segoe UI
-        Gui, EditGui: Add, Edit, Disabled vSVASEHotkeyName1%A_Index% w130 xp+155 y%ypos%, None
+		if (A_Index > SVASENumHotkeys) {
+			Gui, EditGui: Add, Edit, Disabled vSVASEHotkeyName1%A_Index% w%editWidth% xp+155, None
+		} else {
+			Gui, EditGui: Add, Edit, Disabled vSVASEHotkeyName1%A_Index% w%editWidth% xp+155, None
+		}
         Gui, EditGui: Font,, 
 
-        if (A_Index < (SVASENumHotkeys + NumHotkeys) && A_Index > ((SVASENumHotkeys + NumHotkeys) - 3)) {
+		
+        if (A_Index < (totalNumHotkey + NumHotkeys) && A_Index > ((totalNumHotkey + NumHotkeys) - 3)) {
             Gui, EditGui: Font, s10 bold, Segoe UI
             Gui, EditGui: Add, text, cBlack xp+140, Not customizable
             Gui, EditGui: Font,,
         } else {
-            Gui, EditGui: Add, Button, gBind1 v4Bind1%A_Index% yp-1 xp+140, Set Primary  
-            Gui, EditGui: Add, Button, gReset v4Reset%A_Index% xp+85, Reset Key
+            Gui, EditGui: Add, Button, gBind1 v4Bind1%A_Index% xp+140, Set Primary  
+            Gui, EditGui: Add, Button, gReset v4Reset%A_Index% xp+70, Reset Key
         }
-        ypos += 25
+		
+		if (A_Index >= SVASENumHotkeys) {
+            ypos += 27
+        }
     }
     return
 }
@@ -205,34 +281,49 @@ drawEditCuboidsGUI() {
 		}
 
         Gui, EditGui: Font, s10, Segoe UI
-
-        if (A_Index == totalNumHotkey + NumHotkeys) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Special)
-        } else if (A_index <= totalNumHotkey) {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Cuboids) %displayType%
+		
+		if (A_Index <= CuboidsNumHotkeys) {
+            Gui, EditGui: Add, Text, x%firstColumn%, (Cuboids) %displayType%
         } else {
-            Gui, EditGui: Add, Text, cBlack x5 y%ypos%, (Misc) %displayType%
+            if (!CuboidsNumHotkeys) {
+                Gui, EditGui: Add, Text, x%firstColumn%, (Misc) %displayType%
+            } else {
+                if (A_Index > totalNumHotkey) {
+					if (A_Index = (totalNumHotkey + NumHotkeys)) {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Special)
+					} else {
+						Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Misc) %displayType%
+					}
+                } else {
+                    Gui, EditGui: Add, Text, x%secondColumn% y%ypos%, (Cuboids) %displayType%
+                }
+            }
         }
 
         Gui, EditGui: Font, s8, Segoe UI
-        Gui, EditGui: Add, Edit, Disabled vCuboidsHotkeyName1%A_Index% w130 xp+155 y%ypos%, None
+        Gui, EditGui: Add, Edit, Disabled vCuboidsHotkeyName1%A_Index% w%editWidth% xp+155, None
         Gui, EditGui: Font,, 
 
+		
         if (A_Index < (totalNumHotkey + NumHotkeys) && A_Index > ((totalNumHotkey + NumHotkeys) - 3)) {
             Gui, EditGui: Font, s10 bold, Segoe UI
             Gui, EditGui: Add, text, cBlack xp+140, Not customizable
             Gui, EditGui: Font,,
         } else {
-            Gui, EditGui: Add, Button, gBind1 v5Bind1%A_Index% yp-1 xp+140, Set Primary  
+            Gui, EditGui: Add, Button, gBind1 v5Bind1%A_Index% xp+140, Set Primary  
             Gui, EditGui: Add, Button, gReset v5Reset%A_Index% xp+70, Reset Key
         }
-        ypos += 25
+		
+		if (A_Index >= CuboidsNumHotkeys) {
+            ypos += 27
+        }
     }
     return
 }
 
 destoryEditGUI() {
     global
+	ypos := 45
     editText := ""
 	EnableHotkeys()
 	Gui, EditGui: Destroy ; We cannot recreate the same gui. We must destroy or redisplay it.

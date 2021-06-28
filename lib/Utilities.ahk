@@ -1,6 +1,6 @@
 guiHeightModifier() {
 	mult := 25
-	fixedHeight := 150
+	fixedHeight := 160
 	if (workflowCheck == "Line") {
 		return (LINumHotkeys > NumHotkeys ? (LINumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
 	} else if (workflowCheck == "RE") {

@@ -1,5 +1,3 @@
-
-
 searchHotkey(verType){ 
 	;msgbox %A_ThisHotkey% %A_ThisLabel%
 	temp = %A_ThisHotkey%
@@ -138,6 +136,10 @@ cuboidsShortcut(x) {
 		stackLidar()
 	} else if (x == 3) {
 		isoBoid()
+	} else if (x == 4) {
+		depthDense()
+	} else if (x == 5) {
+		imageRadar()
 	}
 	return
 }
@@ -160,10 +162,14 @@ globalShortcut(x) {
 	} else if (x == 8) {
 		winSnapshot()
 	} else if (x == 9) {
-		camForward()
+		firstIFR()
 	} else if (x == 10) {
-		camBackward()
+		lastIFR()
 	} else if (x == 11) {
+		camForward()
+	} else if (x == 12) {
+		camBackward()
+	} else if (x == 13) {
 		special()
 	}
 	return
@@ -264,6 +270,21 @@ winSnapshot() {
 	return
 }
 
+firstIFR() {
+	SendInput, {Alt down}{[}{Alt up}
+	return
+}
+
+lastIFR() {
+	SendInput, {Alt down}{]}{Alt up}
+	return
+}
+
+cycleKF() {
+	SendInput, {Ctrl down}{}{Ctrl up}
+	;left arrow right arrow
+	return
+}
 
 camForward() {
 	BlockInput,  On
@@ -282,7 +303,6 @@ camBackward() {
 }
 
 teamsmute() {
-	
 	WinGet TID, ID, ahk_exe Teams.exe
 	WinActivate ahk_id %TID%
 	Sleep, 200
@@ -292,8 +312,32 @@ teamsmute() {
 	return
 }
 
+boundGrid() {
+	SendInput, {Ctrl down}{Shift down}{g}{Ctrl up}{Shift up}
+	return
+}
+
+pitchUP() {
+	SendInput {Alt down}{q}{Alt up}
+	return
+}
+pitchDOWN() {
+	SendInput {Alt down}{e}{Alt up}
+	return
+}
+
 imageLidar() {
 	SendInput, {Ctrl Down}{Shift down}{l}{Ctrl up}{Shift up}
+	return
+}
+
+imageRadar() {
+	SendInput, {Ctrl Down}{Shift down}{d}{Ctrl up}{Shift up}
+	return
+}
+
+depthDense() {
+	SendInput, {Alt Down}{Shift Down}{p}{Alt Up}{Shift Up}
 	return
 }
 

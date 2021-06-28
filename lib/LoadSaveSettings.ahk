@@ -2,6 +2,7 @@
 SaveSettings(){
 	;iniwrite, %swapCheck%, %ININame%, Version, swap
 	;iniwrite, %laptopCheck%, %ININame%, Version, laptop
+	iniwrite, %versionNum%, %ININame%, Version, version
 	iniwrite, %modCheck%, %ININame%, Version, radio
 	iniwrite, %specialCheck%, %ININame%, Version, special
 	iniwrite, %workflowCheck%, %ININame%, Version, workflow
@@ -65,6 +66,7 @@ LoadSettings(){
 	;global DefaultHKObject
 	;IniRead, laptopValue, %ININame%, Version, laptop
 	;IniRead, swapValue, %ININame%, Version, swap
+	IniRead, versionValue, %ININame%, Version, version
 	IniRead, radioValue, %ININame%, Version, radio
 	IniRead, specialValue, %ININame%, Version, special
 	IniRead, workflowValue, %ININame%, Version, workflow
@@ -76,6 +78,9 @@ LoadSettings(){
 	}
 	if (workflowValue != "ERROR") {
 		workflowCheck := workflowValue
+	}
+	if (versionValue == "ERROR" || versionValue != versionNum) {
+		msgbox, 262144,, A new version of this script has been detected. Please go to File > Reload Script. Please double check any keybinds after.
 	}
 
 	Loop % (LINumHotkeys + NumHotkeys) {
