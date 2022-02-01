@@ -5,7 +5,7 @@ drawAboutGUI() {
     WinGetPos, xxx, yyy
     xxx += 100
     yyy += 100
-    aboutText := "Welcome to FLIDE 3D AllinOne v" versionNum "`n"
+    aboutText := "Welcome to DynamicHotkeys v" versionNum "`n"
     aboutText .= "This script was based off James Shultz script `n"
     aboutText .= "Please visit the user manunal on Lane Graph Home Page for further information.`n"
 	aboutText .= "If you encounter any incorrect keybinds, go to File > Reload Script.`n"
