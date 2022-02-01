@@ -7,8 +7,8 @@ SetupFixedHotKeys() {
 	LIHotkeyList[(LINumHotkeys + NumHotkeys) - 1] := tmp2
 	REHotkeyList[(RENumHotkeys + NumHotkeys) - 2] := tmp1
 	REHotkeyList[(RENumHotkeys + NumHotkeys) - 1] := tmp2
-	LGHotkeyList[(LGNumHotkeys + NumHotkeys) - 2] := tmp1
-	LGHotkeyList[(LGNumHotkeys + NumHotkeys) - 1] := tmp2
+	LGHotkeyList[(LGNumHotkeys + LGNumHotkeysA + NumHotkeys) - 2] := tmp1
+	LGHotkeyList[(LGNumHotkeys + LGNumHotkeysA + NumHotkeys) - 1] := tmp2
 	SVASEHotkeyList[(SVASENumHotkeys + NumHotkeys) - 2] := tmp1
 	SVASEHotkeyList[(SVASENumHotkeys + NumHotkeys) - 1] := tmp2
 	CuboidsHotkeyList[(CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys) - 2] := tmp1

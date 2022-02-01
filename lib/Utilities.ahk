@@ -1,21 +1,21 @@
 guiHeightModifier() {
 	mult := 25
-	fixedHeight := 160
+	fixedHeight := 240
 	if (workflowCheck == "Line") {
-		return (LINumHotkeys > NumHotkeys ? (LINumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
+		return (LINumHotkeys > NumHotkeys ? (LINumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight + 20)
 	} else if (workflowCheck == "RE") {
 		return (RENumHotkeys > NumHotkeys ? (RENumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
 	} else if (workflowCheck == "LG") {
-		return (LGNumHotkeys > NumHotkeys ? (LGNumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
+		return (LGNumHotkeys > (LGNumHotkeysA + NumHotkeys) ? (LGNumHotkeys * mult) + fixedHeight : ((LGNumHotkeysA + NumHotkeys) * mult) + fixedHeight + 10)
 	} else if (workflowCheck == "SVA/SE") {
 		return (SVASENumHotkeys > NumHotkeys ? (SVASENumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
 	} else if (workflowCheck == "Cuboids") {
-		return (CuboidsNumHotkeys > NumHotkeys ? (CuboidsNumHotkeys * mult) + fixedHeight : (NumHotkeys * mult) + fixedHeight)
+		return (CuboidsNumHotkeys > (CuboidsNumHotkeysA + NumHotkeys) ? (CuboidsNumHotkeys * mult) + fixedHeight : ((CuboidsNumHotkeysA + NumHotkeys) * mult) + fixedHeight + 30)
 	}
 }
 
 guiWidthModifier() {
-	fixedWidth := 375
+	fixedWidth := 400
 	if (workflowCheck == "Line") {
 		return guiColumnPos() + fixedWidth
 	} else if (workflowCheck == "RE") {
@@ -31,7 +31,7 @@ guiWidthModifier() {
 
 guiColumnPos() {
 	if (workflowCheck == "Line") {
-		return 450
+		return 460
 	} else if (workflowCheck == "RE") {
 		return 375
 	} else if (workflowCheck == "LG") {
@@ -43,13 +43,9 @@ guiColumnPos() {
 	}
 }
 
-getMinClose() {
-	global
-	if (minclosecheck) {
-		Gui, Cancel
-	} else {
-		ExitApp
-	}
+updateCustomArray(outhk, ctrlnum) {
+	tmp := {hkp: outhk}
+	globalHotkeyListRef[ctrlnum] := tmp
 	return
 }
 
@@ -62,13 +58,13 @@ OptionChanged(){
 
 	SaveSettings()
 
+	updateFileMenu()
 	return
 }
 
 DeleteHotkey(hk){
 	HKVersionType := substr(A_GuiControl, 1, 1)
 
-	soundbeep
 	DisableHotkeys()
 
 	if (HKVersionType == 1) {
@@ -81,6 +77,12 @@ DeleteHotkey(hk){
 		SVASEHotkeyList[hk] := DefaultHKObject
 	} else if (HKVersionType == 5) {
 		CuboidsHotkeyList[hk] := DefaultHKObject
+	} else if (HKVersionType == 6) {
+		if (substr(A_GuiControl, 7, 1) == "A") {
+			globalHotkeyList[hk] := DefaultHKObject
+		} else if (substr(A_GuiControl, 7, 1) == "B") {
+			globalHotkeyListRef[hk] := {hkp: ""}
+		}
 	}
 
 	
@@ -90,14 +92,74 @@ DeleteHotkey(hk){
 	return
 }
 
+refreshUI() {
+	global 
+	destroyMainGUI()
+	height := guiHeightModifier()
+	width := guiWidthModifier()
+	drawMainGUI()
+	UpdateHotkeyControls()
+	return
+}
+
+
+resetAllDefault() {
+    soundbeep
+	DisableHotkeys()
+
+	if (workflowCheck == "Line") { ; Lines
+		totalNumHotkey := LINumHotkeys + NumHotkeys
+		Loop % (totalNumHotkey) {
+			if (!(A_Index == (totalNumHotkey - 2) || A_Index == (totalNumHotkey - 1))) {
+				LIHotkeyList[A_Index] :=  DefaultHKObject
+			}
+		}
+	} else if (workflowCheck == "RE") { ; RE
+		totalNumHotkey := RENumHotkeys + NumHotkeys
+		Loop % (totalNumHotkey) {
+			if (!(A_Index == (totalNumHotkey - 2) || A_Index == (totalNumHotkey - 1))) {
+				REHotkeyList[A_Index] :=  DefaultHKObject
+			}
+		}
+	} else if (workflowCheck == "LG") { ; LG
+		totalNumHotkey := LGNumHotkeys + LGNumHotkeysA + NumHotkeys
+		Loop % (totalNumHotkey) {
+			if (!(A_Index == (totalNumHotkey - 2) || A_Index == (totalNumHotkey - 1))) {
+				LGHotkeyList[A_Index] :=  DefaultHKObject
+			}
+		}
+	} else if (workflowCheck == "SVA/SE") { ; SVA/SE
+		totalNumHotkey := SVASENumHotkeys + NumHotkeys
+		Loop % (totalNumHotkey) {
+			if (!(A_Index == (totalNumHotkey - 2) || A_Index == (totalNumHotkey - 1))) {
+				SVASEHotkeyList[A_Index] :=  DefaultHKObject
+			}
+		}
+	} else if (workflowCheck == "Cuboids") {
+		totalNumHotkey := CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys
+        Loop % (totalNumHotkey) {
+			if (!(A_Index == (totalNumHotkey - 2) || A_Index == (totalNumHotkey - 1))) {
+				CuboidsHotkeyList[A_Index] :=  DefaultHKObject
+			}
+		}
+    }
+
+	Loop % globalNumHotkeys {
+		globalHotkeyList[A_Index] := DefaultHKObject
+		globalHotkeyListRef[A_Index] := DefaultCustomObject
+		globalHotkeyDisplayVar[A_Index] := "Shortcut Name"
+	}
+
+	UpdateHotkeyControls()
+	OptionChanged()
+
+    return
+}
 
 
 ; Builds the prefix for a given hotkey object
 BuildPrefix(hk){
 	prefix := "~"
-	;if (!hk.block){
-	;	prefix .= "~"
-	;}
 	return prefix
 }
 
@@ -114,26 +176,12 @@ StripPrefix(hk){
 	return hk
 }
 
+BuildTitleName() {
+	return substr(A_ScriptName, 1, -4)
+}
 
 BuildIniName(){
-	tmp := A_Scriptname
-	Stringsplit, tmp, tmp,.
-	ini_name := ""
-	last := ""
-	Loop, % tmp0
-	{
-		; build the string up to the last period (.)
-		if (last != ""){
-			if (ini_name != ""){
-				ini_name := ini_name "."
-			}
-			ini_name := ini_name last
-		}
-		last := tmp%A_Index%
-	}
-	;this.ini_name := ini_name ".ini"
-	return ini_name ".ini"
-
+	return substr(A_Scriptname, 1, 17) ".ini"
 }
 
 BuildHotkeyString(str, type := 0){
@@ -145,18 +193,27 @@ BuildHotkeyString(str, type := 0){
 		outhk := str
 	} else {
 		if (modct) {
-			modifiers := ["XBUTTON2", "XBUTTON1", "MBUTTON"]
+			;modifiers := ["XBUTTON2", "XBUTTON1", "MBUTTON"]
+			modifiers := ["XBUTTON2", "XBUTTON1", "MBUTTON", "CTRL","ALT","SHIFT","WIN"]
 
-			Loop, 3 {
+			Loop, 7 {
 				key := modifiers[A_Index]
 				value := HKModifierState[modifiers[A_Index]]
 				if (value) {
 					if (key == "XBUTTON2") {
 						outhk .= "xbutton2 & "
-					} else if (Key == "XBUTTON1") {
+					} else if (key == "XBUTTON1") {
 						outhk .= "xbutton1 & "
 					} else if (key == "MBUTTON") {
 						outhk .= "mbutton  & "
+					} else if (key == "CTRL") {
+						outhk .= "^"
+					} else if (key == "ALT") {
+						outhk .= "!"
+					} else if (key == "SHIFT") {
+						outhk .= "+"
+					} else if (key == "WIN") {
+						outhk .= "#"
 					}
 				}
 			}
@@ -164,57 +221,58 @@ BuildHotkeyString(str, type := 0){
 		outhk .= str
 	}
 
-	/*
-	;FileAppend String: %str%`n, *
-	if (type == 4) { ; Reserved for SPECIAL
-		outhk := str
-	} else if (type == 1) { ; Middle
-		outhk := "mbutton  & "
-		outhk .= str
-	} else if (type == 2) { ; Thumb1
-		outhk := "xbutton2 & "
-		if (str == "xbutton2") {
-			str := "xbutton1"
-		}
-		outhk .= str
-	} else if (type == 3) { ; Thumb2
-		outhk := "xbutton1 & "
-		if (str == "xbutton1") {
-			str := "xbutton2"
-		}
-		outhk .= str
-	}
-	*/
-
 	return outhk
 }
 
 BuildHotKeyName(hk, ctrltype){
-	/*
-	TODO:
-	Remove ctrltype 4
-	*/
 
 	outstr := ""
+	modctr := 0
 	stringupper, hk, hk
-	;FileAppend, %ctrltype%, *
-	if (hk != "") {
+	
+	if (substr(hk,1,1) == "^" || substr(hk,1,1) == "!" || substr(hk,1,1) == "+" || substr(hk,1,1) == "#"){
+		Loop % strlen(hk) {
+			chr := substr(hk,1,1)
+			mod := 0
+
+			if (chr == "^"){
+				; Ctrl
+				mod := "CTRL"
+				modctr++
+			} else if (chr == "!"){
+				; Alt
+				mod := "ALT"
+				modctr++
+			} else if (chr == "+"){
+				; Shift
+				mod := "SHIFT"
+				modctr++
+			} else if (chr == "#"){
+				; Win
+				mod := "WIN"
+				modctr++
+			} else {
+				break
+			}
+			if (mod){
+				if (modctr > 1){
+					outstr .= " + "
+				}
+				outstr .= mod
+				; shift character out
+				hk := substr(hk,2)
+			}
+		} 
+	}
+	if (modctr) {
+		outstr .= " + "
+		outstr .= hk
+	} else if (hk != "") {
 		outstr := hk
 		if (ctrltype == 5) { ; Fixed hotkey
 			tmp2 := substr(hk, 9)
 			outstr := "Space + "
 			outstr .= tmp2
-		} else if (ctrltype == 4) { ; RESERVERD FOR SPECIAL
-			if (hk == "XBUTTON1") {
-				outstr := "Thumb2"
-			} else if (hk == "XBUTTON2") {
-				outstr := "Thumb1"
-			} else if (hk == "ENTER") {
-				outstr := "Enter"
-			} else {
-				;stringupper, hk, hk
-				outstr := hk
-			}
 		} else  {
 			tmp2 := substr(hk, 12)
 			tmp1 := substr(hk, 1,8)
@@ -240,36 +298,9 @@ BuildHotKeyName(hk, ctrltype){
 					outstr .= tmp2
 				}
 			}
-
-			/*
-			;stringupper, tmp2, tmp2
-			if (ctrltype == 1) {
-				outstr := "Middle + "
-				if (tmp2 == "XBUTTON1") { ; handle thumb2 paired with m,x1,x2
-					tmp2 := "Thumb2"
-				} else if (tmp2 == "XBUTTON2") {
-					tmp2 := "Thumb1"
-				}
-			} else if (ctrltype == 2) {
-				outstr := "Thumb1 + "
-				if (tmp2 == "XBUTTON1") {
-					tmp2 := "Thumb2"
-				} else if (tmp2 == "XBUTTON2") {
-					tmp2 := "Thumb1"
-				}
-			} else if (ctrltype == 3) {
-				outstr := "Thumb2 + "
-				if (tmp2 == "XBUTTON1") {
-					tmp2 := "Thumb2"
-				} else if (tmp2 == "XBUTTON2") {
-					tmp2 := "Thumb1"
-				}
-			}
-			outstr .= tmp2
-			*/
 		}
 	} else {
-		outstr := "None"
+		;outstr := "None"
 	}
 
 	return outstr
@@ -285,13 +316,22 @@ SetModifier(hk,state){
 		HKModifierState.xbutton1 := state
 	} else if (hk == "mbutton") {
 		HKModifierState.mbutton := state
-	} 
+	} else if (hk == "lctrl" || hk == "rctrl") {
+		HKModifierState.ctrl := state
+	} else if (hk == "lalt" || hk == "ralt") {
+		HKModifierState.alt := state
+	} else if (hk == "lshift" || hk == "rshift") {
+		HKModifierState.shift := state
+	} else if (hk == "lwin" || hk == "rwin") {
+		HKModifierState.win := state
+	}
+	
 	return
 }
 
 ; Counts how many modifier keys are currently held
 CurrentModifierCount(){
-	global HKModifierState
+	global 
 
-	return HKModifierState.xbutton2 + HKModifierState.xbutton1 + HKModifierState.mbutton
+	return HKModifierState.xbutton2 + HKModifierState.xbutton1 + HKModifierState.mbutton + HKModifierState.ctrl + HKModifierState.alt + HKModifierState.shift + HKModifierState.win
 }

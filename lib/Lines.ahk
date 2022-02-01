@@ -1,240 +1,254 @@
+
 /*
-List of uncommon:
-Triangle yield and int region
-solid white with parking
-inferred parking with shoulder/parking
-inferred parking cross/unknown traffic directions
-inferred parking crosswalk/parking
-reversible line with parking
-bidirectional yellow dashed line
-bidirectional solid white line
-bidiretional solid yellow line
+Current list of active shortcuts:
+    Crosswalk Crosswalk-RF
+    Dashed White
+    Dashed Yellow
+    Dashed Solid Yellow Suicide-RF
+    Double Solid Yellow Bidirectional
+    Inferred Parking
+    Short Dashed White
+    Short Dashed White Bike-RA
+    Short Dashed White Shoulder-RA
+    Solid Red Parking-RF
+    Solid Red Shoulder-RF
+    Solid Red Shoulder/Parking
+    Solid White Bike-RA
+    Solid White Bike/Shoulder
+    Solid White Crosswalk-RF
+    Solid White Shoulder-RA
+    Solid White Stop-Semantic
+    Solid Yellow Shoulder-RA
 */
 
-dashedWhite() { ; dashed white line
+/*
+Program Reference keys:
+Appearance              .1
+    unknown         1
+    crosswalk       2
+    dashed          3
+    dashed_solid    4
+    dotted          5
+    double_dashed   6
+    double_dotted   7
+    double_solid    8
+    inferred        9
+    short_dashed    0
+    solid           a
+    triangle        b
+    zigzag          c
+    pavement        d
+Color                   .2
+    unknown         1
+    white           2
+    yellow          3
+    blue            4
+    red             5
+Semantics               .3
+    unknown         1
+    intersection    2
+    stop            3
+    tl-stop         4
+    cw-stop         5
+    yield           6
+    rr-stop         7
+    keep clear      8
+Direction               .4
+    unknown         1
+    aligned         2
+    cross           3
+    neither         4
+Traffic Direction       .5
+    unknown         1
+    unidirectional  2
+    bidirectional   3
+    ambiguous       4
+    reversible      5
+Region Facing           .6
+Region Away             .7
+    unknown         1
+    normal          2
+    bike            3
+    parking         4
+    suicide         5
+    cw              6
+    keep clear      7
+    shoulder        8
+    int-island      9
+*/
+
+crosswalkCW() { ; crosswalk appearance crosswalk-facing
+    SendInput, .12
+    SendInput, .22
+    SendInput, .43
+    SendInput, .51
+    SendInput, .66
+    SendInput, .72
+    return
+}
+
+
+dashedWhite() { ; Dashed White
     SendInput, .13
     SendInput, .22
     SendInput, .42 ; Aligned, Uni, Normal/Normal
     SendInput, .52
     SendInput, .62
     SendInput, .72
+    return
 }
 
-solidWhiteShoulderRA() { ; solid white shoulder region away
-    SendInput, .1a
-    SendInput, .22
-    SendInput, .42 ; Aligned, Uni, Normal/Normal
-    SendInput, .52
-    SendInput, .62
-    SendInput, .78
-}
-
-solidYellowMRF() { ; solid yellow median region facing
-    SendInput, .1a
-    SendInput, .23
-    SendInput, .42 ; Aligned, Uni, Normal/Normal
-    SendInput, .52
-    SendInput, .69
-    SendInput, .72
-}
-
-infParkingRA() { ; inferred parking region away
-    SendInput, .19
-    SendInput, .52
-    SendInput, .62
-    SendInput, .74
-}
-
-solidWhiteCWRF() { ; solid white crosswalk region facing
-    SendInput, .1a
-    SendInput, .22
-    SendInput, .66
-    SendInput, .72
-}
-
-solidWhiteCWInt() { ; solid white crosswalk/intersection region
-    SendInput, .1a
-    SendInput, .22
-    SendInput, .66
-    SendInput, .70
-}
-
-shortDashedBikeRA() { ; short dashed bike regiona away
-   SendInput, .10
-    SendInput, .22
-    SendInput, .42
-    SendInput, .52
-    SendInput, .62
-    SendInput, .73
-}
-
-shortDashedShoulderRA() { ; short dashed shoulder region away
-    SendInput, .10
-    SendInput, .22
-    SendInput, .42
-    SendInput, .52
-    SendInput, .62
-    SendInput, .78
-}
-
-doubleSolidYellowMedianRF() { ; double solid yellow median region facing
-    SendInput, .18
+dashedYellow() { ; Dashed Yellow
+    SendInput, .13
     SendInput, .23
     SendInput, .42
     SendInput, .52
-    SendInput, .69
+    SendInput, .62
     SendInput, .72
+    return
 }
 
-doubleSolidYellowBid() { ; double solid yellow bidirectional
+dashedSolidYellowSuicide() { ; dashed solid yellow suicide-facing
+    SendInput, .14
+    SendInput, .23
+    SendInput, .42
+    SendInput, .65
+    SendInput, .72
+    return
+}
+
+doubleSolidYellowBi() { ; double solid yellow bidirectional
     SendInput, .18
     SendInput, .23
     SendInput, .42
     SendInput, .53
     SendInput, .62
     SendInput, .72
+    return
 }
 
-cwCWRF() { ; crosswalk appearance crosswalk region facing
-    SendInput, .12
-    SendInput, .22
-    SendInput, .43
-    SendInput, .51
-    SendInput, .66
-    SendInput, .72
+infParking() { ; Inferred Parking
+    SendInput, .19
+    SendInput, .52
+    SendInput, .62
+    SendInput, .74
+    return
 }
 
-cwCWInt() { ; crosswalk appearance crosswalk/intersection region
-    SendInput, .12
-    SendInput, .22
-    SendInput, .43
-    SendInput, .51
-    SendInput, .66
-    SendInput, .70
-}
-
-intGuidingLine() { ; intersectio guiding line (requires semantics update)
+shortDashedWhite() { ; short dashed white normal
     SendInput, .10
     SendInput, .22
-    SendInput, .32
-    SendInput, .44
-    SendInput, .51
-    SendInput, .60
-    SendInput, .70
-}
-
-dashedSolidYellowSuicideRF() { ; dashed solid yellow suicide region facing
-    SendInput, .14
-    SendInput, .23
     SendInput, .42
-    SendInput, .65
+    SendInput, .52
+    SendInput, .62
     SendInput, .72
+    return
 }
 
-solidWhiteBikeRA() { ; solid white bike region away
+shortDashedWhiteBike() { ; short dashed white bike-away
+    SendInput, .10
+    SendInput, .22
+    SendInput, .42
+    SendInput, .52
+    SendInput, .62
+    SendInput, .73
+    return
+}
+
+shortDashedWhiteShoulder() { ; short dashed white shoulder-away
+    SendInput, .10
+    SendInput, .22
+    SendInput, .42
+    SendInput, .52
+    SendInput, .62
+    SendInput, .78
+    return
+}
+
+solidRedParking() { ; Solid Red Parking Region
+    SendInput, .1a
+    SendInput, .25
+    SendInput, .42
+    SendInput, .52
+    SendInput, .62
+    SendInput, .74
+    return
+}
+
+solidRedShoulder() { ; Solid Red Parking Region
+    SendInput, .1a
+    SendInput, .25
+    SendInput, .42
+    SendInput, .52
+    SendInput, .62
+    SendInput, .78
+    return
+}
+
+solidRedShoulderParking() { ; Solid Red Shoulder Parking
+    SendInput, .1a
+    SendInput, .25
+    SendInput, .42
+    SendInput, .52
+    SendInput, .68
+    SendInput, .74
+    return
+}
+
+solidWhiteBike() { ; solid white bike-away
     SendInput, .1a
     SendInput, .22
     SendInput, .42
     SendInput, .52
     SendInput, .62
     SendInput, .73
+    return
 }
 
-solidWhiteBikeShoulder() { ; solid white bike/shoulder region
+solidWhiteBikeShoulder() { ; solid white bike/shoulder
     SendInput, .1a
     SendInput, .22
     SendInput, .42
     SendInput, .52
     SendInput, .63
     SendInput, .78
+    return
 }
-
-solidWhiteInt() { ; solid white intersection region facing
+solidWhiteCW() { ; solid white crosswalk-facing
     SendInput, .1a
     SendInput, .22
-    SendInput, .43
-    SendInput, .51
-    SendInput, .60
-    SendInput, .72
-}
-
-shortDashed() { ; short dashed white line
-    SendInput, .10
-    SendInput, .22
-    SendInput, .42
-    SendInput, .52
-    SendInput, .62
-    SendInput, .72
-}
-
-; triangle appearance yield semantic and int region facing (limited by FLIDE)
-; solid white parking region
-solidWhiteParking() { ; checking regions
-    SendInput, .1a
-    SendInput, .22
-    SendInput, .42
-    SendInput, .52
-    SendInput, .64
-    SendInput, .72
-}
-; inferred parking shoulder Facing parking away
-infShoulderParking() {
-    SendInput, .19
-    SendInput, .21
-    SendInput, .42
-    SendInput, .52
-    SendInput, .68
-    SendInput, .74
-}
-; inferred parking with cross/unknown traffic directions
-infCrossParking() { ; check regions?
-    SendInput, .19
-    SendInput, .21
-    SendInput, .43
-    SendInput, .51
-    SendInput, .64
-    SendInput, .72
-}
-; inferred parking with crosswalk facing/parking away
-infCWParking() { ; should be cross?
-    SendInput, .19
-    SendInput, .21
-    SendInput, .43
-    SendInput, .51
     SendInput, .66
-    SendInput, .74
-}
-; reversible line with parkign region facing
-revParking() {
-    SendInput, .42
-    SendInput, .55
-    SendInput, .64
     SendInput, .72
+    return
 }
-; bidirectional yellow dashed line
-dashedYellowBid() {
-    SendInput, .13
-    SendInput, .23
-    SendInput, .42
-    SendInput, .53
-    SendInput, .62
-    SendInput, .72
-}
-; bidirectional solid white line
-solidWhiteBid() {
+
+solidWhiteShoulder() { ; Solid White Shoulder
     SendInput, .1a
     SendInput, .22
-    SendInput, .42
-    SendInput, .53
+    SendInput, .42 ; Aligned, Uni, Normal/Normal
+    SendInput, .52
+    SendInput, .62
+    SendInput, .78
+    return
+}
+
+solidWhiteStop() { ; Solid white Stop Semantic
+    SendInput, .1a
+    SendInput, .22
+    SendInput, .33
+    SendInput, .43
+    SendInput, .51
     SendInput, .62
     SendInput, .72
+    return
 }
-; bidirectional solid yellow line
-solidYellowBid() {
+
+solidYellowShoulder() { ; Solid yellow Shoulder
     SendInput, .1a
     SendInput, .23
-    SendInput, .42
-    SendInput, .53
+    SendInput, .42 ; Aligned, Uni, Normal/Normal
+    SendInput, .52
     SendInput, .62
-    SendInput, .72
+    SendInput, .78
+    return
 }

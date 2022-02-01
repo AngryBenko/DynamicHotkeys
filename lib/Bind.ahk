@@ -52,76 +52,77 @@ detectClash(type, tmp) { ; only compare if HK is not empty
 	}
 }
 
+preventKBMModifiers(select) {
+	global
+	modct := CurrentModifierCount()
+	if (modct > 1) {
+		if (HKModifierState["XBUTTON2"] || HKModifierState["XBUTTON1"] || HKModifierState["MBUTTON"]) {
+			return 1
+		}
+	}
+
+	if (select == 1) {
+		if (HKModifierState["CTRL"] || HKModifierState["ALT"] || HKModifierState["SHIFT"] || HKModifierState["WIN"]) {
+			return 2
+		}
+	}
+	return false
+}
+
 ;applyKeybind(HKVersionType, select, outhk, HKControlType, ctrlnum)
 applyKeybind(type, select, outhk, HKControlType, ctrlnum) {
 	; type will be used to determine if this is WF or GL specific
 	; we can then test workflowCheck to see what the current WF is
 	if (type == 1) {
-		if (select == 1) { ; select primary or secondary
-			;FileAppend DID I GET HERE? ,*
-			tmp := {hkp: outhk, typep: HKControlType, status: 0}
-		} else {
-			tmp := {hkp: LIHotkeyList[ctrlnum].hkp, typep: LIHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
-		}
+		tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		LIHotkeyList[ctrlnum] := tmp
 	} else if (type == 2) {
-		if (select == 1) { ; select primary or secondary
-			tmp := {hkp: outhk, typep: HKControlType, status: 0}
-		} else {
-			tmp := {hkp: REHotkeyList[ctrlnum].hkp, typep: REHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
-		}
+		tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		REHotkeyList[ctrlnum] := tmp
 	} else if (type == 3) {
-		if (select == 1) { ; select primary or secondary
-			tmp := {hkp: outhk, typep: HKControlType, status: 0}
-		} else {
-			tmp := {hkp: LGHotkeyList[ctrlnum].hkp, typep: LGHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
-		}
+		tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		LGHotkeyList[ctrlnum] := tmp
 	} else if (type == 4) {
-		if (select == 1) { ; select primary or secondary
-			tmp := {hkp: outhk, typep: HKControlType, status: 0}
-		} else {
-			tmp := {hkp: SVASEHotkeyList[ctrlnum].hkp, typep: SVASEHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
-		}
+		tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		SVASEHotkeyList[ctrlnum] := tmp
 	} else if (type == 5) {
-		if (select == 1) { ; select primary or secondary
-			tmp := {hkp: outhk, typep: HKControlType, status: 0}
-		} else {
-			tmp := {hkp: CuboidsHotkeyList[ctrlnum].hkp, typep: CuboidsHotkeyList[ctrlnum].typep, hks: outhk, types: HKControlType, status: 0}
-		}
+		tmp := {hkp: outhk, typep: HKControlType, status: 0}
 		CuboidsHotkeyList[ctrlnum] := tmp
+	} else if (type == 6) {
+		tmp := {hkp: outhk, typep: HKControlType, status: 0}
+		globalHotkeyList[ctrlnum] := tmp
 	}
+
+	; type == 6, apply globals
 	return
 }
 
+
+
 Bind(ctrlnum, select){
-	global BindMode
-	global EXTRA_KEY_LIST
-	global HKLastHotkey
-	global HotkeyList
-	global HKControlType
-	global HKSecondaryInput
-	global modCheck
-	global NumHotkeys
+	global
 
 	; init vars
-	HKControlType := 0
+	HKControlType := 0 ; is HKControlType always 0?
 	HKVersionType := substr(A_GuiControl, 1, 1)
-	HKModifierState := {xbutton2: 0, xbutton1: 0, mbutton: 0}
+	; HKVersionType determines what workflow to apply keybind.
+	; 6 would be for global shortcuts
+	HKModifierState := {xbutton2: 0, xbutton1: 0, mbutton: 0, ctrl: 0, alt: 0, shift: 0, win: 0}
     ;msgbox %HKVersionType%
 	
 	; Disable existing hotkeys
 	DisableHotkeys()
 
 	; Start Bind Mode - this starts detections for mouse buttons/special keys
-	BindMode := 1
+	BindMode := True
 
 	; Show the prompt
-	prompt .= "You must hold down a desired modifier button: ThumbButton1, ThumbButton2, or Middle Mouse Button.`n"
+	if (select == 1) {
+		prompt := "You must hold down a desired modifier button: ThumbButton1, ThumbButton2, or Middle Mouse Button.`n"
+	} else if (select == 2) {
+		prompt := "Please press and hold a modifier key (CTRL, ALT, SHIFT, WIN, ThumbButton1, ThumbButton2, or Middle Mouse Button)`n"
+	}
 	prompt .= "While holding one of the designated modifier buttons above, next press your desired key.`n"
-	prompt .= "(Special) is reserved custom keybinds. Ignore unless you know what you are doing.`n"
 	prompt .= "Supports most keyboard keys.`n"
 	prompt .= "`nHit Escape to cancel."
 	Gui, EditGui: +LastFound
@@ -140,20 +141,14 @@ Bind(ctrlnum, select){
 	; set to "Match"
 	Loop {
 		Input, detectedkey, L1, %EXTRA_KEY_LIST% ; EXTRA_KET_LIST determines the Endkey
-		;FileAppend, %detectedkey%, *
 		tmp := ""
-
 		if (substr(ErrorLevel, 1, 7) == "EndKey:"){
 			tmp := substr(ErrorLevel, 8)
 			detectedkey := tmp
 			if (tmp == "Escape") {
-				if (HKControlType > 0) {
-					detectedkey := HKSecondaryInput
-				} else {
-					detectedkey := ""
-					; Start listening to key up event for Escape, to see if it was held
-					hotkey, Escape up, EscapeReleased, ON
-				}
+				detectedkey := ""
+				; Start listening to key up event for Escape, to see if it was held
+				hotkey, Escape up, EscapeReleased, ON
 			}
 		} else if (CurrentModifierCount() == 0) { ; Restriction: Must always be accompanied by set modifiers
 			tmp := "Continue"
@@ -162,9 +157,10 @@ Bind(ctrlnum, select){
 
 	; Hide prompt
 	Gui, EditPrompt:Submit
+	Gui, EditPrompt: Destroy
 
 	; Stop listening to mouse
-	BindMode := 0
+	BindMode := False
 
 	; Process results
 
@@ -173,51 +169,18 @@ Bind(ctrlnum, select){
 	; update: {hkp: "", typep: "", hks: "", types: ""}
 	;
 	if (detectedkey){
-		; Update the hotkey object
-		;outhk := BuildHotkeyString(detectedkey,HKControlType)
-		;FileAppend TypeB: %HKControlType%`n, *
-		;HKControlType := modCheck
-		;FileAppend RADIO: %modCheck%`n, *
-
-		/*
-		TODO:
-		Remove HKControltype 4
-		*/
-		
-		/*
-		if (ctrlnum == (LINumHotkeys + NumHotkeys) && workflowCheck == "Line") {
-			HKControlType := 4
-		} else if (ctrnum == (RENumHotkeys + NumHotkeys) && workflowCheck == "RE") {
-			HKControlType := 4
-		} else if (ctrlnum == (LGNumHotkeys + NumHotkeys) && workflowCheck == "LG") {
-			HKControlType := 4
-		} else if (ctrlnum == (SVASENumHotkeys + NumHotkeys) && workflowCheck == "SVASE") {
-			HKControlType := 4
-		}
-		*/
-		
-		;FileAppend TypeA: %HKControlType%`n, *
 		outhk := BuildHotkeyString(detectedkey,HKControlType)
 		tmp := {hk: outhk, type: HKControlType, status: 0}
 		clash := 0
-		prevent := 0
-
-		if (detectedkey == "enter" && HKControlType != 4) { ; Add prevention for special keybinds to only take thumb2
-			; detectedkey == "enter" && HKControlType != 4
-			prevent := 1
-		}
-		if (HKControlType == 4 && specialCheck != 1 && select == 2) {
-			prevent := 3
-		}
+		prevent := preventKBMModifiers(select) 
+	
 
 		clash := detectClash(HKVersionType, outhk)
 
 		if (prevent == 1) {
-			msgbox, 262144,, 'Enter' key is reserved for special keybind. Exiting...
+			msgbox, 262144,, You cannot use Mouse Buttons with Keyboard modifiers. Exiting...
 		} else if (prevent == 2) {
-			msgbox, 262144,, %detectedkey% is restricted with special keybind. Exiting...
-		} else if (prevent == 3) {
-			msgbox, 262144,, Please select 'Custom' from drop down list if you want to use secondary keybind for (Special)
+			msgbox, 262144,, Please use ThumbButton1, ThumbButton2, or Middle Mouse Button for workflow shortcuts.
 		} else if (clash) {
 			; Ask if want to overwrite - Need Shortcut, keybind(s) OLD/NEW
 			msgbox, 262144,, You cannot bind the same hotkey to two different actions. Exiting...
@@ -225,8 +188,17 @@ Bind(ctrlnum, select){
 			; =============================
 			;FileAppend DID I GET HERE? ,*
 			;FileAppend type: %HKVersionType% , *
-			applyKeybind(HKVersionType, select, outhk, HKControlType, ctrlnum)
-
+			; Custom Keybinds
+			; -> If the "name", apply the keybind as normal
+			; -> If the hotkey, set to array to refer to the "name"
+			; -> substr(A_GuiControl, 7, 1) ; v6Bind2B
+			; -> B is the actual hotkey
+			if (select == 2 && substr(A_GuiControl, 7, 1) == "B") {
+				updateCustomArray(outhk, ctrlnum)
+			} else {
+				applyKeybind(HKVersionType, select, outhk, HKControlType, ctrlnum)
+			}
+			; updateCustomArray(HKVersionType, select, outhk, HKControlType, ctrlnum)
 		}
 		UpdateHotkeyControls()
 		; Rebuild rest of hotkey object, save settings etc

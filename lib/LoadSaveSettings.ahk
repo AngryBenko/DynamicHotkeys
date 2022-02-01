@@ -1,11 +1,10 @@
 ; Write settings to the INI
 SaveSettings(){
-	;iniwrite, %swapCheck%, %ININame%, Version, swap
-	;iniwrite, %laptopCheck%, %ININame%, Version, laptop
+	;Msgbox, 262144,, Saving Settings...
 	iniwrite, %versionNum%, %ININame%, Version, version
-	iniwrite, %modCheck%, %ININame%, Version, radio
-	iniwrite, %specialCheck%, %ININame%, Version, special
 	iniwrite, %workflowCheck%, %ININame%, Version, workflow
+	iniwrite, %disCamCheck%, %ININame%, Version, camera
+	iniwrite, %darkMode%, %ININame%, Version, dark
 
 	if (workflowCheck == "Line" || firstRun == 1) {
 		Loop % (LINumHotkeys + NumHotkeys) {
@@ -28,7 +27,7 @@ SaveSettings(){
 		}
 	}
 	if (workflowCheck == "LG" || firstRun == 1) {
-		Loop % (LGNumHotkeys + NumHotkeys) {
+		Loop % (LGNumHotkeys + LGNumHotkeysA + NumHotkeys) {
 			hkp := LGHotkeyList[A_Index].hkp
 			typep := LGHotkeyList[A_Index].typep
 
@@ -58,30 +57,46 @@ SaveSettings(){
 			iniwrite, %typep%, %ININame%, CuboidsHotkeys, hk_%A_Index%_typep
 		}
 	}
+
+	Loop % globalNumHotkeys {
+		; two sets
+
+		name := globalHotkeyDisplayVar[A_Index]
+		hkp := globalHotkeyList[A_Index].hkp
+		hkp2 := globalHotkeyListRef[A_Index].hkp
+		typep := globalHotkeyList[A_Index].typep
+		
+		iniwrite, %A_Index%, %ININame%, GlobalHotkeys, hk_%A_Index%_num
+		iniwrite, %name%, %ININame%, GlobalHotkeys, hk_%A_Index%_name
+		iniwrite, %hkp%, %ININame%, GlobalHotkeys, hk_%A_Index%_hkp
+		iniwrite, %hkp2%, %ININame%, GlobalHotkeys, hk_%A_Index%_hkp2
+		iniwrite, %typep%, %ININame%, GlobalHotkeys, hk_%A_Index%_typep
+	}
+	;; save Global, most likely will have two sets
 	return
 }
 
 ; Read settings from the INI
 LoadSettings(){
-	;global DefaultHKObject
-	;IniRead, laptopValue, %ININame%, Version, laptop
-	;IniRead, swapValue, %ININame%, Version, swap
+	;Msgbox, 262144,, Loading Settings...
 	IniRead, versionValue, %ININame%, Version, version
-	IniRead, radioValue, %ININame%, Version, radio
-	IniRead, specialValue, %ININame%, Version, special
 	IniRead, workflowValue, %ININame%, Version, workflow
-	if (radioValue != "ERROR") {
-		modCheck := radioValue
-	}
-	if (specialValue != "ERROR") {
-		specialCheck := specialValue
-	}
+	IniRead, disCameraValue, %ININame%, Version, camera
+	IniRead, darkModeValue, %ININame%, Version, dark
+	
 	if (workflowValue != "ERROR") {
 		workflowCheck := workflowValue
 	}
 	if (versionValue == "ERROR" || versionValue != versionNum) {
-		msgbox, 262144,, A new version of this script has been detected. Please go to File > Reload Script. Please double check any keybinds after.
+		msgbox, 262144,, A new version of this script has been detected. As a result some keybinds may have been changed. Please go to File > Reload Script. Please double check any keybinds after.
 	}
+	if (disCameraValue != "ERROR") {
+		disCamCheck := disCameraValue
+	}
+	if (darkModeValue != "ERROR") {
+		darkMode := darkModeValue
+	}
+
 
 	Loop % (LINumHotkeys + NumHotkeys) {
 		LIHotkeyList[A_Index] := DefaultHKObject
@@ -107,7 +122,7 @@ LoadSettings(){
 		}
 	}
 
-	Loop % (LGNumHotkeys + NumHotkeys) {
+	Loop % (LGNumHotkeys + LGNumHotkeysA + NumHotkeys) {
 		LGHotkeyList[A_Index] := DefaultHKObject
 		IniRead, num, %ININame%, LGHotkeys, hk_%A_Index%_num,
 		IniRead, valp, %ININame% , LGHotkeys, hk_%A_Index%_hkp,
@@ -143,5 +158,33 @@ LoadSettings(){
 		}
 	}
 
+	Loop % globalNumHotkeys {
+		globalHotkeyList[A_Index] := DefaultHKObject
+		globalHotkeyListRef[A_Index] := DefaultCustomObject
+		globalHotkeyDisplayVar[A_Index] := ""
+		IniRead, num, %ININame%, GlobalHotkeys, hk_%A_Index%_num,
+		IniRead, name, %ININame%, GlobalHotkeys, hk_%A_Index%_name,
+		IniRead, valp, %ININame% , GlobalHotkeys, hk_%A_Index%_hkp,
+		IniRead, typep, %ININame%, GlobalHotkeys, hk_%A_Index%_typep,
+		IniRead, valp2, %ININame%, GlobalHotkeys, hk_%A_Index%_hkp2,
+		if (name != "ERROR") {
+			if (name == "") {
+				globalHotkeyDisplayVar[A_Index] := "Shortcut Name"
+			} else {
+				globalHotkeyDisplayVar[A_Index] := name
+			}
+		}
+		if (valp != "ERROR") {
+			IniRead, typep, %ININame%, GlobalHotkeys, hk_%A_Index%_typep, 0
+			globalHotkeyList[A_Index] := {hkp: valp, typep: typep, status: 0}
+		}
+		if (valp2 != "ERROR") {
+			IniRead, typep, %ININame%, GlobalHotkeys, hk_%A_Index%_typep, 0
+			globalHotkeyListRef[A_Index] := {hkp: valp2}
+		}
+	}
+
+	;; load Global, most likely will have two sets
 	UpdateHotkeyControls()
+	return
 }

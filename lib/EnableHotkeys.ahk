@@ -1,83 +1,45 @@
 EnableHotkeys(){
-	global HotkeyList
-	global NumHotkeys
-	global specialCheck
-	global workflowCheck
 
 	;Enable based on workflow, workflowCheck
+
+	Loop % globalNumHotkeys {
+		status := globalHotkeyList[A_Index].status
+		hkp := globalHotkeyList[A_Index].hkp
+		if ((hkp != "") && status == 0){
+				prefix := BuildPrefix(globalHotkeyList[A_Index])
+				hotkey, %prefix%%hkp%, DoHotkey6, ON
+				globalHotkeyList[A_Index].status := 1
+			}
+	}
 
 	if (workflowCheck == "Line") {
 		Loop % (LINumHotkeys + NumHotkeys){ ; ALways enable global
 			status := LIHotkeyList[A_Index].status
 			hkp := LIHotkeyList[A_Index].hkp
 			if ((hkp != "") && status == 0){
-				;FileAppend ENABLE`n, *
-				;FileAppend hkp: %hkp%`n, *
-				;FileAppend hks: %hks%`n, *
 				prefix := BuildPrefix(LIHotkeyList[A_Index])
-				if (A_Index != (LINumHotkeys + NumHotkeys)) {
-					;prefix := BuildPrefix(LIHotkeyList[A_Index])
-					;Msgbox % "ADDING: " prefix "," hk
-					hotkey, %prefix%%hkp%, DoHotkey1, ON
-					;hotkey, %prefix%%hks%, DoHotkey%A_Index%, ON
-				} else {
-					if (specialCheck == 2) {
-						hotkey, %hkp%, TeamsMute, ON
-					} else {
-						hotkey, %hkp%, DoHotkey1, ON
-					}
-				}
+				hotkey, %prefix%%hkp%, DoHotkey1, ON
 				LIHotkeyList[A_Index].status := 1
 			}
 		}
+
 	} else if (workflowCheck == "RE") {
 		Loop % (RENumHotkeys + NumHotkeys){ ; ALways enable global
 			status := REHotkeyList[A_Index].status
 			hkp := REHotkeyList[A_Index].hkp
 			if ((hkp != "") && status == 0){
-				;FileAppend ENABLE`n, *
-				;FileAppend hkp: %hkp%`n, *
-				;FileAppend hks: %hks%`n, *
 				prefix := BuildPrefix(REHotkeyList[A_Index])
-				if (A_Index != (RENumHotkeys + NumHotkeys)) {
-					;prefix := BuildPrefix(REHotkeyList[A_Index])
-					;Msgbox % "ADDING: " prefix "," hk
-					hotkey, %prefix%%hkp%, DoHotkey2, ON
-					;hotkey, %prefix%%hks%, DoHotkey%A_Index%, ON
-				} else {
-					if (specialCheck == 2) {
-						hotkey, %hkp%, TeamsMute, ON
-					} else {
-						hotkey, %hkp%, DoHotkey2, ON
-					}
-				}
-				
+				hotkey, %prefix%%hkp%, DoHotkey2, ON
 				REHotkeyList[A_Index].status := 1
 			}
 		}
 	} else if (workflowCheck == "LG") {
-		Loop % (LGNumHotkeys + NumHotkeys){ ; ALways enable global
+		Loop % (LGNumHotkeys + LGNumHotkeysA + NumHotkeys){ ; ALways enable global
 			status := LGHotkeyList[A_Index].status
 			hkp := LGHotkeyList[A_Index].hkp
 			if ((hkp != "") && status == 0){
-				;FileAppend ENABLE`n, *
-				;FileAppend hkp: %hkp%`n, *
-				;FileAppend hks: %hks%`n, *
 				prefix := BuildPrefix(LGHotkeyList[A_Index])
-				if (A_Index != (LGNumHotkeys + NumHotkeys)) {
-					;prefix := BuildPrefix(LGHotkeyList[A_Index])
-					;Msgbox % "ADDING: " prefix "," hk
-					hotkey, %prefix%%hkp%, DoHotkey3, ON
-					;hotkey, %prefix%%hks%, DoHotkey%A_Index%, ON
-
-				} else {
-					if (specialCheck == 2) {
-						hotkey, %hkp%, TeamsMute, ON
-					} else {
-						hotkey, %hkp%, DoHotkey3, ON
-					}
-				}
-				
+				hotkey, %prefix%%hkp%, DoHotkey3, ON
 				LGHotkeyList[A_Index].status := 1
 			}
 		}
@@ -86,48 +48,70 @@ EnableHotkeys(){
 			status := SVASEHotkeyList[A_Index].status
 			hkp := SVASEHotkeyList[A_Index].hkp
 			if ((hkp != "") && status == 0){
-				;FileAppend ENABLE`n, *
-				;FileAppend hkp: %hkp%`n, *
-				;FileAppend hks: %hks%`n, *
 				prefix := BuildPrefix(SVASEHotkeyList[A_Index])
-				if (A_Index != (SVASENumHotkeys + NumHotkeys)) {
-					;prefix := BuildPrefix(SVASEHotkeyList[A_Index])
-					;Msgbox % "ADDING: " prefix "," hk
-					hotkey, %prefix%%hkp%, DoHotkey4, ON
-				} else {
-					if (specialCheck == 2) {
-						hotkey, %hkp%, TeamsMute, ON
-					} else {
-						hotkey, %hkp%, DoHotkey4, ON
-					}
-				}
+				hotkey, %prefix%%hkp%, DoHotkey4, ON
 				SVASEHotkeyList[A_Index].status := 1
 			}
 		}
+
 	} else if (workflowCheck == "Cuboids") {
 		Loop % (CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys){ ; ALways enable global
 			status := CuboidsHotkeyList[A_Index].status
 			hkp := CuboidsHotkeyList[A_Index].hkp
 			if ((hkp != "") && status == 0){
-				;FileAppend ENABLE`n, *
-				;FileAppend hkp: %hkp%`n, *
-				;FileAppend hks: %hks%`n, *
 				prefix := BuildPrefix(CuboidsHotkeyList[A_Index])
-				if (A_Index != (CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys)) {
-					;prefix := BuildPrefix(CuboidsHotkeyList[A_Index])
-					;Msgbox % "ADDING: " prefix "," hk
-					hotkey, %prefix%%hkp%, DoHotkey5, ON
-					;hotkey, %prefix%%hks%, DoHotkey%A_Index%, ON
-				} else {
-					if (specialCheck == 2) {
-						hotkey, %hkp%, TeamsMute, ON
-					} else {
-						hotkey, %hkp%, DoHotkey5, ON
-					}
-				}
+				hotkey, %prefix%%hkp%, DoHotkey5, ON
 				CuboidsHotkeyList[A_Index].status := 1
 			}
 		}
+
+	}
+
+	if (disCamCheck) {
+		; LINES
+		hkp := LIHotkeyList[(LINumHotkeys + NumHotkeys) - 2].hkp
+		hotkey, %prefix%%hkp%, DoHotkey1, OFF
+		LIHotkeyList[(LINumHotkeys + NumHotkeys) - 2].status := 0
+
+		hkp := LIHotkeyList[(LINumHotkeys + NumHotkeys) - 1].hkp
+		hotkey, %prefix%%hkp%, DoHotkey1, OFF
+		LIHotkeyList[(LINumHotkeys + NumHotkeys) - 1].status := 0
+		
+		; RE
+		hkp := REHotkeyList[(RENumHotkeys + NumHotkeys) - 2].hkp
+		hotkey, %prefix%%hkp%, DoHotkey2, OFF
+		REHotkeyList[(RENumHotkeys + NumHotkeys) - 2].status := 0
+
+		hkp := REHotkeyList[(RENumHotkeys + NumHotkeys) - 1].hkp
+		hotkey, %prefix%%hkp%, DoHotkey2, OFF
+		REHotkeyList[(RENumHotkeys + NumHotkeys) - 1].status := 0
+		
+		; LG
+		hkp := LGHotkeyList[(LGNumHotkeys + LGNumHotkeysA + NumHotkeys) - 2].hkp
+		hotkey, %prefix%%hkp%, DoHotkey3, OFF
+		LGHotkeyList[(LGNumHotkeys + LGNumHotkeysA + NumHotkeys) - 2].status := 0
+
+		hkp := LGHotkeyList[(LGNumHotkeys + LGNumHotkeysA + NumHotkeys) - 1].hkp
+		hotkey, %prefix%%hkp%, DoHotkey3, OFF
+		LGHotkeyList[(LGNumHotkeys + LGNumHotkeysA + NumHotkeys) - 1].status := 0
+
+		; SVA/SE
+		hkp := SVASEHotkeyList[(SVASENumHotkeys + NumHotkeys) - 2].hkp
+		hotkey, %prefix%%hkp%, DoHotkey4, OFF
+		SVASEHotkeyList[(SVASENumHotkeys + NumHotkeys) - 2].status := 0
+
+		hkp := SVASEHotkeyList[(SVASENumHotkeys + NumHotkeys) - 1].hkp
+		hotkey, %prefix%%hkp%, DoHotkey4, OFF
+		SVASEHotkeyList[(SVASENumHotkeys + NumHotkeys) - 1].status := 0
+
+		;CUBOIDS
+		hkp := CuboidsHotkeyList[(CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys) - 2].hkp
+		hotkey, %prefix%%hkp%, DoHotkey5, OFF
+		CuboidsHotkeyList[(CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys) - 2].status := 0
+
+		hkp := CuboidsHotkeyList[(CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys) - 1].hkp
+		hotkey, %prefix%%hkp%, DoHotkey5, OFF
+		CuboidsHotkeyList[(CuboidsNumHotkeys + CuboidsNumHotkeysA + NumHotkeys) - 1].status := 0
 	}
 	
 	return

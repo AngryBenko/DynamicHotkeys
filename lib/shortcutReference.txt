@@ -1,0 +1,14 @@
+J.Connection Tool
+Alt + X.Auto Center
+I.Spline
+[.Reverse Direction
+].Reverse Region
+Alt + Shift + T.Satelite Tube
+Alt + Shift + G.Google Tiles
+Alt + Shift + S.Cursor Mode
+Win + Shift + S.Windows Snapshot
+Alt + [.First IF
+Alt + ].Last IF
+Alt + Shift + =.Label Search
+Alt + M.Bing Maps
+Alt + Y.Negative ROI
